@@ -82,62 +82,63 @@ export function LandingPage({ onLogin }: LandingPageProps) {
     { value: '95%', label: 'Taxa de Satisfação' }
   ];
 
-  const testimonials = [
-    {
-      text: "A gamificação tornou meu aprendizado muito mais divertido e envolvente. Completei 3 cursos em apenas 2 meses!",
-      image: "https://randomuser.me/api/portraits/women/1.jpg",
-      name: "Ana Silva",
-      role: "Desenvolvedora Frontend",
-    },
-    {
-      text: "Os quizzes com feedback instantâneo me ajudaram a fixar o conteúdo de forma incrível. Recomendo muito!",
-      image: "https://randomuser.me/api/portraits/men/2.jpg",
-      name: "Carlos Souza",
-      role: "Designer UI/UX",
-    },
-    {
-      text: "O sistema de rankings me mantém super motivada. É ótimo ver meu progresso e competir de forma saudável.",
-      image: "https://randomuser.me/api/portraits/women/3.jpg",
-      name: "Beatriz Costa",
-      role: "Estudante de Tecnologia",
-    },
-    {
-      text: "Consegui mudar de carreira graças aos cursos da plataforma. O certificado me ajudou muito nas entrevistas!",
-      image: "https://randomuser.me/api/portraits/men/4.jpg",
-      name: "Pedro Oliveira",
-      role: "Analista de Dados",
-    },
-    {
-      text: "As badges e conquistas me incentivam a continuar estudando. É como um jogo onde você realmente aprende!",
-      image: "https://randomuser.me/api/portraits/women/5.jpg",
-      name: "Juliana Santos",
-      role: "Product Manager",
-    },
-    {
-      text: "A plataforma é intuitiva e o progresso visual me ajuda a acompanhar minha evolução de forma clara.",
-      image: "https://randomuser.me/api/portraits/women/6.jpg",
-      name: "Mariana Lima",
-      role: "Desenvolvedora Full Stack",
-    },
-    {
-      text: "Nunca pensei que estudar poderia ser tão engajante. O sistema de XP é genial!",
-      image: "https://randomuser.me/api/portraits/men/7.jpg",
-      name: "Rafael Ferreira",
-      role: "UX Designer",
-    },
-    {
-      text: "A ouvidoria da plataforma realmente ouve nossas sugestões. Sinto que faço parte da evolução do EduGame!",
-      image: "https://randomuser.me/api/portraits/women/8.jpg",
-      name: "Camila Rodrigues",
-      role: "Desenvolvedora Mobile",
-    },
-    {
-      text: "Os vídeos são de excelente qualidade e os instrutores são muito didáticos. Valeu cada minuto!",
-      image: "https://randomuser.me/api/portraits/men/9.jpg",
-      name: "Lucas Almeida",
-      role: "Engenheiro de Software",
-    },
-  ];
+ const testimonials = [
+  {
+    text: "Sempre achei política complicada. Com a Civilize.ai, finalmente entendi como leis e decisões impactam meu dia a dia. Hoje eu opino nas consultas públicas com muito mais segurança.",
+    image: "https://randomuser.me/api/portraits/women/1.jpg",
+    name: "Ana Silva",
+    role: "Estudante de Escola Pública",
+  },
+  {
+    text: "Os quizzes sobre direitos e políticas públicas fixaram muito mais do que qualquer aula tradicional. Já usei o que aprendi para ajudar minha família em uma situação real.",
+    image: "https://randomuser.me/api/portraits/men/2.jpg",
+    name: "Carlos Souza",
+    role: "Agente Comunitário",
+  },
+  {
+    text: "A jornada gamificada me manteve engajada. Completei vários módulos sobre participação social e hoje participo de audiências públicas da minha cidade.",
+    image: "https://randomuser.me/api/portraits/women/3.jpg",
+    name: "Beatriz Costa",
+    role: "Estudante de Direito",
+  },
+  {
+    text: "Eu nunca tinha usado uma plataforma de governo aberto. A Civilize.ai me guiou passo a passo, e consegui contribuir em uma consulta sobre transporte público.",
+    image: "https://randomuser.me/api/portraits/men/4.jpg",
+    name: "Pedro Oliveira",
+    role: "Trabalhador do Setor de Serviços",
+  },
+  {
+    text: "As badges de participação cidadã são geniais. Cada vez que eu participo de uma consulta ou respondo um quiz, sinto que estou construindo um currículo cidadão de verdade.",
+    image: "https://randomuser.me/api/portraits/women/5.jpg",
+    name: "Juliana Santos",
+    role: "Professora do Ensino Médio",
+  },
+  {
+    text: "A visualização do impacto coletivo é o que mais me motiva. Ver quantas pessoas estão aprendendo e opinando nos mesmos temas que eu é muito poderoso.",
+    image: "https://randomuser.me/api/portraits/women/6.jpg",
+    name: "Mariana Lima",
+    role: "Líder de Grêmio Estudantil",
+  },
+  {
+    text: "Nunca pensei que cidadania pudesse ser divertida. O sistema de XP e missões transformou 'lei e artigo' em algo vivo, conectado à minha realidade.",
+    image: "https://randomuser.me/api/portraits/men/7.jpg",
+    name: "Rafael Ferreira",
+    role: "Desenvolvedor Júnior",
+  },
+  {
+    text: "Usei a Civilize.ai com meus alunos em um projeto de participação social. Eles não só aprenderam, como começaram a questionar e propor ideias para a escola e para o bairro.",
+    image: "https://randomuser.me/api/portraits/women/8.jpg",
+    name: "Camila Rodrigues",
+    role: "Educadora Social",
+  },
+  {
+    text: "A plataforma reúne dados públicos, explicações simples e desafios práticos. Em vez de só reclamar nas redes sociais, agora eu participo de processos oficiais de decisão.",
+    image: "https://randomuser.me/api/portraits/men/9.jpg",
+    name: "Lucas Almeida",
+    role: "Morador de Periferia",
+  },
+];
+
 
   const firstColumn = testimonials.slice(0, 3);
   const secondColumn = testimonials.slice(3, 6);
@@ -146,7 +147,7 @@ export function LandingPage({ onLogin }: LandingPageProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#F0F1FA]">
+    <div className="min-h-screen bg-[#F0F1FA]" style={{ fontFamily: "'LT Institute', sans-serif" }}>
       {/* Navigation */}
       <header className="sticky top-0 left-0 right-0 mb-[20px] w-[90%] mx-auto z-50 border border-white/20 backdrop-blur-md supports-[backdrop-filter]:bg-white/5 rounded-[100px]">
         <div className="container mx-auto p-[16px] rounded-[100px]">
@@ -210,11 +211,11 @@ export function LandingPage({ onLogin }: LandingPageProps) {
             <div className="space-y-6 z-10">
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-center">
                 Sua jornada{' '}
-                <TextLoop interval={3} className="text-primary">
+                <TextLoop interval={3}>
                   {[
-                    <span key="gamificada">gamificada</span>,
-                    <span key="interativa">interativa</span>,
-                    <span key="transformadora">transformadora</span>
+                    <span key="gamificada" style={{ color: '#FF2A1D', fontWeight: 700 }}>gamificada</span>,
+                    <span key="interativa" style={{ color: '#3283FF', fontWeight: 700 }}>interativa</span>,
+                    <span key="transformadora" style={{ color: '#E3C545', fontWeight: 700 }}>transformadora</span>
                   ]}
                 </TextLoop>
                 <br />
@@ -229,7 +230,7 @@ export function LandingPage({ onLogin }: LandingPageProps) {
                 </FlowHoverButton>
               </div>
             </div>
-          }
+          } className="font-[Inter]"
         >
           <ImageWithFallback
             src="https://images.unsplash.com/photo-1673515335586-f9f662c01482?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1400"
@@ -262,24 +263,24 @@ export function LandingPage({ onLogin }: LandingPageProps) {
                   Cursos rápidos, simples e divertidos.
 A IA transforma projetos de lei, políticas públicas e dados oficiais em conteúdos curtos, em linguagem acessível.
                 </p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <ImageWithFallback
                     src="https://images.unsplash.com/photo-1759984782106-4b56d0aa05b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=500"
                     alt="Estudante assistindo aula online"
                     className="rounded-lg object-cover h-32 md:h-44 lg:h-60 w-full shadow-lg"
                   />
-                  <div className="flex flex-col justify-center p-4 bg-muted rounded-lg">
+                  <div className="flex flex-col justify-center p-4 bg-muted rounded-lg" style={{ background: 'linear-gradient(to bottom right, #3283FF, #68A4FF)' }}>
                     <div className="flex items-center gap-2 mb-3">
-                      <BookOpen className="h-5 w-5" style={{ color: '#3283FF' }} />
-                      <p className="text-sm">O que é um Projeto de Lei?</p>
+                      <BookOpen className="h-5 w-5" style={{ color: '#FFF' }} />
+                      <p className="text-lm text-white">O que é um Projeto de Lei?</p>
                     </div>
                     <div className="flex items-center gap-2 mb-3">
-                      <Video className="h-5 w-5" style={{ color: '#3283FF' }} />
-                      <p className="text-sm">Como o Congresso funciona?</p>
+                      <Video className="h-5 w-5" style={{ color: '#FFF' }} />
+                      <p className="text-lm text-white">Como o Congresso funciona?</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Target className="h-5 w-5" style={{ color: '#3283FF' }} />
-                      <p className="text-sm">Orçamento público em 5 minutos.</p>
+                      <Target className="h-5 w-5" style={{ color: '#FFF' }} />
+                      <p className="text-lm text-white">Orçamento público em 5 minutos.</p>
                     </div>
                   </div>
                 </div>
@@ -291,7 +292,7 @@ A IA transforma projetos de lei, políticas públicas e dados oficiais em conte�
             content: (
               <div>
                 <div className="mb-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ backgroundColor: '#3283FF20', color: '#3283FF' }}>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ backgroundColor: '#fff', color: '#3283FF' }}>
                     <Brain className="h-4 w-4" />
                     <span className="text-sm">Pratique</span>
                   </div>
@@ -303,34 +304,34 @@ A IA transforma projetos de lei, políticas públicas e dados oficiais em conte�
                   Quizzes, desafios e jogos de simulação para treinar a cidadania na prática.
                 </p>
                 <div className="mb-8">
-                  <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
-                    <CheckCircle2 className="h-5 w-5" style={{ color: '#E3C545' }} />
+                  <div className="flex gap-2 items-center text-neutral-600 dark:text-neutral-300 text-sm md:text-base mb-2">
+                    <CheckCircle2 className="h-5 w-5" style={{ color: '#82F690' }} />
                     Simule o voto de um deputado
                   </div>
-                  <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
-                    <CheckCircle2 className="h-5 w-5" style={{ color: '#E3C545' }} />
+                  <div className="flex gap-2 items-center text-neutral-600 dark:text-neutral-300 text-sm md:text-base mb-2">
+                    <CheckCircle2 className="h-5 w-5" style={{ color: '#82F690' }} />
                     Quiz de direitos (fácil → médio → difícil)
                   </div>
-                  <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
-                    <CheckCircle2 className="h-5 w-5" style={{ color: '#E3C545' }} />
+                  <div className="flex gap-2 items-center text-neutral-600 dark:text-neutral-300 text-sm md:text-base mb-2">
+                    <CheckCircle2 className="h-5 w-5" style={{ color: '#82F690' }} />
                     Desafios para identificar problemas reais na sua cidade
                   </div>
-                  <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base">
-                    <CheckCircle2 className="h-5 w-5" style={{ color: '#E3C545' }} />
+                  <div className="flex gap-2 items-center text-neutral-600 dark:text-neutral-300 text-sm md:text-base">
+                    <CheckCircle2 className="h-5 w-5" style={{ color: '#82F690' }} />
                     Avance para novos módulos e cursos
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <ImageWithFallback
                     src="https://images.unsplash.com/photo-1752937326758-f130e633b422?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=500"
                     alt="Conquista e certificado"
                     className="rounded-lg object-cover h-32 md:h-44 lg:h-60 w-full shadow-lg"
                   />
-                  <div className="flex flex-col justify-center p-4 rounded-lg" style={{ background: 'linear-gradient(to bottom right, #E3C54520, #E3C54530)' }}>
+                  <div className="flex flex-col justify-center p-4 rounded-lg" style={{ background: 'linear-gradient(to bottom right, #3283FF, #68A4FF)' }}>
                     <Trophy className="h-12 w-12 mb-3" style={{ color: '#E3C545' }} />
-                    <p className="text-sm mb-1">Ganhe até</p>
-                    <p className="text-2xl mb-1">100 XP</p>
-                    <p className="text-xs text-muted-foreground">por quiz perfeito</p>
+                    <p className="text-sm mb-1 text-white">Ganhe até</p>
+                    <p className="text-2xl mb-1 text-white">100 XP</p>
+                    <p className="text-xs text-muted-foreground text-white">por quiz perfeito</p>
                   </div>
                 </div>
               </div>
@@ -342,8 +343,8 @@ A IA transforma projetos de lei, políticas públicas e dados oficiais em conte�
               <div>
                 <div className="mb-4">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ backgroundColor: '#FF2A1D20', color: '#FF2A1D' }}>
-                    <Award className="h-4 w-4" />
-                    <span className="text-sm">Conquiste</span>
+                    <Award className="h-4 w-4 text-white" />
+                    <span className="text-sm text-[#FF2A1D]">Conquiste</span>
                   </div>
                 </div>
                 <p className="text-neutral-800 dark:text-neutral-200 text-base md:text-lg mb-4">
@@ -398,18 +399,18 @@ Seu progresso vira:
                     Badges reais por participação em processos oficiais
                   </div>
                   <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base">
-                    <Star className="h-5 w-5" style={{ color: '#E3C545' }} />
+                    <Star className="h-5 w-5" style={{ color: '#FF2A1D' }} />
                     Seu histórico de estudos se conecta a impacto público mensurável
                   </div>
                 </div>
-                <div className="p-6 rounded-lg border-2" style={{ background: 'linear-gradient(to bottom right, #FF2A1D20, #FF2A1D30)', borderColor: '#FF2A1D50' }}>
+                <div className="p-6 rounded-lg border-2" style={{ background: 'linear-gradient(to bottom right, #3283FF, #68A4FF)', borderColor: '#FF2A1D50' }}>
                   <div className="flex items-start gap-4">
-                    <MessageSquare className="h-8 w-8 flex-shrink-0" style={{ color: '#FF2A1D' }} />
+                    <MessageSquare className="h-8 w-8 flex-shrink-0" style={{ color: '#fff' }} />
                     <div>
-                      <p className="text-base mb-2">
+                      <p className="text-base mb-2 text-white">
                         <strong>Sua voz importa!</strong>
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground text-white">
                         Civilize AI é a ponte entre Educação → Ação
                       </p>
                     </div>
@@ -461,7 +462,7 @@ Seu progresso vira:
                   fourth: "Sociedade"
                 }}
                 buttonTexts={{
-                  first: "EduGame",
+                  first: "Civilize",
                   second: "Inovação"
                 }}
                 lightColor="#00A6F5"

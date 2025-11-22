@@ -58,7 +58,7 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
   const questions = [
     {
       id: 'name',
-      mascotText: 'Olá! Sou a Aralize! Mas pode me chamar de Lize, seu companheiro de aprendizado!',
+      mascotText: 'Olá! Sou a Aralize! Mas pode me chamar de Lize, sua companheira de aprendizado!',
       question: 'Como você gostaria de ser chamado?',
       type: 'text',
       placeholder: 'Digite seu nome ou apelido',

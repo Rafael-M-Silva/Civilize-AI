@@ -71,7 +71,7 @@ export const FooterTapedDesign = ({ className }: FooterTapedDesignProps) => {
       <div className="my-3 px-4 md:px-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-sm text-neutral">
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-8 items-start sm:items-center">
           <p className="whitespace-nowrap">
-            ©{currentYear} EduGame. Todos os direitos reservados.
+            ©{currentYear} Civilize AI. Todos os direitos reservados.
           </p>
           <div className="flex flex-row gap-4">
             <a href="#privacidade" className="hover:text-neutral/80 transition-colors">Privacidade</a>
