@@ -4,6 +4,7 @@ import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
 import { BookOpen, Trophy, Target, Clock } from 'lucide-react';
 import { Course, UserProgress } from '@/lib/types';
+import { ExpandableChatDemo } from './ExpandableChatDemo';
 
 interface DashboardProps {
   courses: Course[];
@@ -144,6 +145,9 @@ export function Dashboard({ courses, userProgress, userXp, userLevel, onStartCou
           })}
         </div>
       </div>
+      
+      {/* Chat AI */}
+      <ExpandableChatDemo />
     </div>
   );
 }

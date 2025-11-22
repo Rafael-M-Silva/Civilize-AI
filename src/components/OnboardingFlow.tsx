@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import image_e7c68171915ceb3c591a71757fda4ab4b592daed from 'figma:asset/e7c68171915ceb3c591a71757fda4ab4b592daed.png';
+import image_daff672e48b6bae4cae7f3fe67ed448e6a653de1 from 'figma:asset/daff672e48b6bae4cae7f3fe67ed448e6a653de1.png';
+import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, Sparkles, Play, CheckCircle2 } from 'lucide-react';
+import { ImageWithFallback } from './figma/ImageWithFallback';
+import { FlowHoverButton } from './ui/flow-hover-button';
 
 interface OnboardingData {
   preferredName: string;
@@ -32,10 +36,29 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
   const totalSteps = 5;
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
+  // Event listener para tecla Enter
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        // Se estamos na primeira aula, completar a lição
+        if (showFirstLesson && canCompleteLesson) {
+          handleCompleteLesson();
+        } 
+        // Caso contrário, avançar no onboarding
+        else if (!showFirstLesson && canProceed()) {
+          handleNext();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentStep, onboardingData, showFirstLesson, videoWatched, quizAnswers]); // Dependências para atualizar o listener
+
   const questions = [
     {
       id: 'name',
-      mascotText: 'Olá! Sou o EduOwl, seu companheiro de aprendizado! 🦉',
+      mascotText: 'Olá! Sou a Aralize! Mas pode me chamar de Lize, seu companheiro de aprendizado!',
       question: 'Como você gostaria de ser chamado?',
       type: 'text',
       placeholder: 'Digite seu nome ou apelido',
@@ -46,51 +69,103 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
       question: 'Selecione suas áreas de interesse:',
       type: 'multiple',
       options: [
-        { value: 'tech', label: 'Tecnologia & Programação', icon: '💻' },
-        { value: 'business', label: 'Negócios & Empreendedorismo', icon: '💼' },
-        { value: 'design', label: 'Design & Criatividade', icon: '🎨' },
-        { value: 'science', label: 'Ciências & Matemática', icon: '🔬' },
-        { value: 'languages', label: 'Idiomas', icon: '🌍' },
-        { value: 'personal', label: 'Desenvolvimento Pessoal', icon: '🌟' },
+        { value: 'tech', label: 'Vida Civil e Cartórios', icon: '📜' },
+        { value: 'business', label: 'Saúde, Educação e Direitos Sociais', icon: '🏥' },
+        { value: 'design', label: 'Trabalho, Renda e Previdência', icon: '💼' },
+        { value: 'science', label: 'Consumo, Bancos e Serviços Digitais', icon: '💳' },
+        { value: 'languages', label: 'Justiça, Segurança e Direitos Humanos', icon: '⚖️' },
+        { value: 'personal', label: 'Cidade, Meio Ambiente e Participação Pública', icon: '🌳' },
       ],
     },
     {
-      id: 'level',
-      mascotText: 'Perfeito! Agora preciso saber seu nível atual de conhecimento.',
-      question: 'Como você se considera em relação ao aprendizado online?',
-      type: 'single',
-      options: [
-        { value: 'beginner', label: 'Iniciante', desc: 'Estou começando agora' },
-        { value: 'intermediate', label: 'Intermediário', desc: 'Tenho alguma experiência' },
-        { value: 'advanced', label: 'Avançado', desc: 'Já tenho bastante conhecimento' },
-        { value: 'expert', label: 'Expert', desc: 'Sou muito experiente' },
-      ],
+  id: 'level',
+  mascotText: 'Perfeito! Agora quero entender em que ponto da sua jornada cidadã você está.',
+  question: 'Como você se considera hoje em relação a cidadania, leis e participação política?',
+  type: 'single',
+  options: [
+    {
+      value: 'beginner',
+      label: 'Cidadão iniciante',
+      desc: 'Quase não acompanho política e quero começar do zero.',
     },
     {
-      id: 'goals',
-      mascotText: 'Maravilha! Agora me conte seus objetivos.',
-      question: 'O que você quer alcançar com seus estudos?',
-      type: 'multiple',
-      options: [
-        { value: 'career', label: 'Avançar na carreira', icon: '🚀' },
-        { value: 'newskills', label: 'Aprender novas habilidades', icon: '📚' },
-        { value: 'certification', label: 'Obter certificações', icon: '🏆' },
-        { value: 'hobby', label: 'Hobby e conhecimento pessoal', icon: '🎯' },
-        { value: 'career-change', label: 'Mudar de carreira', icon: '🔄' },
-      ],
+      value: 'intermediate',
+      label: 'Cidadão em construção',
+      desc: 'Já sei um pouco, às vezes acompanho notícias e debates.',
     },
     {
-      id: 'availability',
-      mascotText: 'Última pergunta! Vamos criar uma rotina ideal para você.',
-      question: 'Quanto tempo você pode dedicar aos estudos por semana?',
-      type: 'single',
-      options: [
-        { value: '1-3', label: '1-3 horas', desc: 'Ritmo tranquilo' },
-        { value: '4-7', label: '4-7 horas', desc: 'Ritmo moderado' },
-        { value: '8-15', label: '8-15 horas', desc: 'Ritmo intenso' },
-        { value: '15+', label: 'Mais de 15 horas', desc: 'Imersão total' },
-      ],
+      value: 'advanced',
+      label: 'Cidadão engajado',
+      desc: 'Acompanho votações, projetos e conversas sobre política.',
     },
+    {
+      value: 'expert',
+      label: 'Cidadão referência',
+      desc: 'Entendo bem leis e processos e costumo ajudar outras pessoas a se informar.',
+    },
+  ],
+},
+    {
+  id: 'goals',
+  mascotText: 'Maravilha! Agora me conta o que você quer conquistar com a Civilize.ai.',
+  question: 'Quais são seus principais objetivos como cidadão?',
+  type: 'multiple',
+  options: [
+    {
+      value: 'understand-rights',
+      label: 'Entender meus direitos',
+      icon: '📜',
+    },
+    {
+      value: 'participate-more',
+      label: 'Participar mais das decisões',
+      icon: '🗳️',
+    },
+    {
+      value: 'help-community',
+      label: 'Ajudar minha comunidade',
+      icon: '🤝',
+    },
+    {
+      value: 'monitor-government',
+      label: 'Acompanhar governo e leis',
+      icon: '👀',
+    },
+    {
+      value: 'develop-skills',
+      label: 'Desenvolver competências cívicas',
+      icon: '🧠',
+    },
+  ],
+},
+    {
+  id: 'availability',
+  mascotText: 'Última pergunta! Quero deixar sua experiência com a Civilize.ai com a sua cara.',
+  question: 'Como você prefere aprender e participar dentro da plataforma?',
+  type: 'single',
+  options: [
+    {
+      value: 'slow-and-steady',
+      label: 'Passo a passo',
+      desc: 'Poucos desafios por semana, conteúdos curtos e sem pressa.',
+    },
+    {
+      value: 'balanced',
+      label: 'Ritmo equilibrado',
+      desc: 'Um pouco de teoria e um pouco de jogo/desafio ao longo da semana.',
+    },
+    {
+      value: 'mission-mode',
+      label: 'Modo missão',
+      desc: 'Intensivo em períodos curtos, com várias missões seguidas.',
+    },
+    {
+      value: 'event-based',
+      label: 'Focado em eventos',
+      desc: 'Quero mergulhar quando tiver temas quentes, consultas públicas ou votações importantes.',
+    },
+  ],
+},
   ];
 
   const currentQuestion = questions[currentStep];
@@ -188,6 +263,61 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
     const newAnswers = [...quizAnswers];
     newAnswers[questionId - 1] = answer;
     setQuizAnswers(newAnswers);
+    
+    // Verificar se a resposta está correta e tocar som
+    const question = introQuiz.find(q => q.id === questionId);
+    if (question) {
+      const isCorrect = answer === question.correct;
+      if (isCorrect) {
+        playCorrectSound();
+      } else {
+        playErrorSound();
+      }
+    }
+  };
+  
+  // Função para tocar som de acerto
+  const playCorrectSound = () => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // Som mais agradável com múltiplas frequências
+    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+    oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+    oscillator.type = 'sine';
+    
+    // Volume mais baixo
+    gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.3);
+  };
+  
+  // Função para tocar som de erro
+  const playErrorSound = () => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // Som de erro mais suave
+    oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+    oscillator.frequency.linearRampToValueAtTime(250, audioContext.currentTime + 0.15);
+    oscillator.type = 'triangle'; // Tipo mais suave que sawtooth
+    
+    // Volume mais baixo
+    gainNode.gain.setValueAtTime(0.06, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.15);
   };
 
   const handleWatchVideo = () => {
@@ -207,12 +337,15 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
     onComplete(onboardingData);
   };
 
-  const canCompleteLesson = videoWatched && quizAnswers.length === introQuiz.length;
+  const canCompleteLesson = videoWatched && 
+    quizAnswers[0] !== undefined && quizAnswers[0] !== '' &&
+    quizAnswers[1] !== undefined && quizAnswers[1] !== '' &&
+    quizAnswers[2] !== undefined && quizAnswers[2] !== '';
 
   // Se deve mostrar a primeira aula
   if (showFirstLesson) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-purple-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-violet-950 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#6E9DED] via-white to-purple-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-violet-950 flex items-center justify-center p-4 bg-[rgba(110,157,237,0.56)]">
         <div className="w-full max-w-4xl">
           <motion.div
             className="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden"
@@ -221,7 +354,7 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
             transition={{ duration: 0.5 }}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-violet-500 to-purple-600 p-8">
+            <div className="bg-[#6E9DED] p-8">
               <div className="flex items-center gap-4 mb-4">
                 <motion.div
                   className="w-16 h-16 rounded-full bg-white p-1"
@@ -234,8 +367,12 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
                     repeatDelay: 3
                   }}
                 >
-                  <div className="w-full h-full rounded-full bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center text-3xl">
-                    🦉
+                  <div className="w-full h-full rounded-full bg-gradient-to-br flex items-center justify-center text-3xl">
+                    <ImageWithFallback
+                      src={image_daff672e48b6bae4cae7f3fe67ed448e6a653de1}
+                      alt="Aralize - Mascote Papagaio"
+                      className="w-full h-full object-cover rounded-full p-[2px]"
+                    />
                   </div>
                 </motion.div>
                 <div>
@@ -258,11 +395,11 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
                 </h2>
                 <div className="relative aspect-video bg-zinc-900 rounded-2xl overflow-hidden">
                   {!videoWatched ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-violet-500/20 to-purple-500/20">
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br">
                       <Button
                         onClick={handleWatchVideo}
                         size="lg"
-                        className="rounded-full w-20 h-20 bg-white hover:bg-violet-50 text-violet-600 hover:text-violet-700"
+                        className="rounded-full w-20 h-20 bg-white"
                       >
                         <Play className="w-10 h-10" />
                       </Button>
@@ -301,7 +438,7 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
                     {introQuiz.map((q, qIndex) => (
                       <div
                         key={q.id}
-                        className="p-6 bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30 rounded-2xl border-2 border-border"
+                        className="p-6 bg-gradient-to-br dark:from-violet-950/30 dark:to-purple-950/30 rounded-2xl border-2 border-border"
                       >
                         <h3 className="font-semibold mb-4 text-foreground">
                           {qIndex + 1}. {q.question}
@@ -350,15 +487,14 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
               {/* Complete Button */}
               {videoWatched && (
                 <div className="pt-4">
-                  <Button
+                  <FlowHoverButton
                     onClick={handleCompleteLesson}
                     disabled={!canCompleteLesson}
-                    size="lg"
-                    className="w-full rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full rounded-[100px] px-6 py-3"
                   >
                     {canCompleteLesson ? 'Finalizar e Acessar Dashboard' : 'Responda todas as questões'}
-                    <ChevronRight className="w-5 h-5 ml-2" />
-                  </Button>
+                   
+                  </FlowHoverButton>
                 </div>
               )}
             </div>
@@ -369,21 +505,22 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-purple-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-violet-950 flex items-center justify-center p-4">
+    <div className="min-h-screen via-white dark:from-zinc-950 dark:via-zinc-900 dark:to-violet-950 flex items-center justify-center p-4 bg-[rgba(110,157,237,0.56)]">
       <div className="w-full max-w-3xl">
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-muted-foreground">
+            <span className="text-sm font-medium text-[rgb(255,255,255)]">
               Passo {currentStep + 1} de {totalSteps}
             </span>
-            <span className="text-sm font-medium text-violet-600 dark:text-violet-400">
+            <span className="text-sm font-medium" style={{ color: '#fff' }}>
               {Math.round(progress)}%
             </span>
           </div>
           <div className="h-2 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-violet-500 to-purple-600"
+              className="h-full"
+              style={{ background: 'linear-gradient(to right, #3283FF, #3283FF)' }}
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -409,7 +546,8 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
               {/* Mascot */}
               <div className="flex items-start gap-4 mb-8">
                 <motion.div
-                  className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-violet-400 to-purple-600 p-1 flex-shrink-0"
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-full p-1 flex-shrink-0"
+                  style={{ background: 'linear-gradient(to bottom right, #39B848, #82F690)' }}
                   animate={{ 
                     rotate: [0, -5, 5, -5, 0],
                     scale: [1, 1.05, 1]
@@ -421,12 +559,17 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
                   }}
                 >
                   <div className="w-full h-full rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center text-4xl">
-                    🦉
+                    <ImageWithFallback
+                      src={image_e7c68171915ceb3c591a71757fda4ab4b592daed}
+                      alt="Aralize - Mascote Papagaio"
+                      className="w-full h-full object-cover p-[0px]"
+                    />
                   </div>
                 </motion.div>
                 <div className="flex-1">
                   <motion.div
-                    className="bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-950 dark:to-purple-950 rounded-2xl rounded-tl-none p-4 relative"
+                    className="rounded-2xl rounded-tl-none p-4 relative"
+                    style={{ background: 'linear-gradient(to bottom right, #3283FF15, #3283FF25)' }}
                     initial={{ scale: 0.95 }}
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.3, delay: 0.1 }}
@@ -434,7 +577,7 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
                     <p className="text-sm md:text-base text-foreground/90">
                       {currentQuestion.mascotText}
                     </p>
-                    <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-violet-500 animate-pulse" />
+                    <Sparkles className="absolute -top-2 -right-2 w-6 h-6 animate-pulse" style={{ color: '#E3C545' }} />
                   </motion.div>
                 </div>
               </div>
@@ -452,7 +595,8 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
                     value={onboardingData.preferredName}
                     onChange={(e) => handleTextInput(e.target.value)}
                     placeholder={currentQuestion.placeholder}
-                    className="w-full px-6 py-4 rounded-2xl border-2 border-border bg-background text-foreground text-lg focus:outline-none focus:border-violet-400 transition-colors"
+                    className="w-full px-6 py-4 rounded-2xl border-2 border-border bg-background text-foreground text-lg focus:outline-none transition-colors"
+                    style={{ focusBorderColor: '#3283FF' }}
                     autoFocus
                   />
                 )}
@@ -472,9 +616,10 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
                           onClick={() => handleMultipleChoice(option.value)}
                           className={`p-5 rounded-2xl border-2 transition-all text-left ${
                             isSelected
-                              ? 'border-violet-500 bg-violet-50 dark:bg-violet-950'
-                              : 'border-border hover:border-violet-300'
+                              ? 'bg-opacity-10'
+                              : 'border-border hover:border-opacity-50'
                           }`}
+                          style={isSelected ? { borderColor: '#3283FF', backgroundColor: '#3283FF15' } : {}}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                         >
@@ -485,7 +630,8 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
                               <motion.div
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                className="ml-auto w-6 h-6 rounded-full bg-violet-500 flex items-center justify-center"
+                                className="ml-auto w-6 h-6 rounded-full flex items-center justify-center"
+                                style={{ backgroundColor: '#3283FF' }}
                               >
                                 <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -518,9 +664,12 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
                           type="button"
                           className={`w-full p-5 rounded-2xl border-2 transition-all text-left ${
                             isSelected
-                              ? 'border-violet-500 bg-violet-50 dark:bg-violet-950'
-                              : 'border-border hover:border-violet-300'
+                              ? ''
+                              : 'border-border'
                           }`}
+                          style={isSelected ? { borderColor: '#3283FF', backgroundColor: '#3283FF15' } : { borderColor: 'inherit' }}
+                          onMouseEnter={(e) => !isSelected && (e.currentTarget.style.borderColor = '#3283FF80')}
+                          onMouseLeave={(e) => !isSelected && (e.currentTarget.style.borderColor = '')}
                           whileHover={{ scale: 1.01 }}
                           whileTap={{ scale: 0.99 }}
                         >
@@ -533,7 +682,8 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
                               <motion.div
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                className="w-6 h-6 rounded-full bg-violet-500 flex items-center justify-center flex-shrink-0"
+                                className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                                style={{ backgroundColor: '#3283FF' }}
                               >
                                 <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -553,24 +703,21 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
           {/* Navigation Buttons */}
           <div className="flex gap-4 mt-8">
             {currentStep > 0 && (
-              <Button
+              <FlowHoverButton
                 onClick={handleBack}
-                variant="outline"
-                size="lg"
-                className="rounded-xl"
+                className="rounded-[100px] px-[64px] py-[12px]"
               >
                 Voltar
-              </Button>
+              </FlowHoverButton>
             )}
-            <Button
+            <FlowHoverButton
               onClick={handleNext}
               disabled={!canProceed()}
-              size="lg"
-              className="ml-auto rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex ml-auto rounded-[100px] px-[59px] py-[12px]"
             >
               {currentStep === totalSteps - 1 ? 'Finalizar' : 'Próximo'}
-              <ChevronRight className="w-5 h-5 ml-2" />
-            </Button>
+            
+            </FlowHoverButton>
           </div>
         </motion.div>
       </div>

@@ -307,7 +307,7 @@ export default function App() {
       <>
         <AccessibilityTools />
         <SignInPage
-          title={<span className="font-light text-foreground tracking-tighter">Bem-vindo ao <span className="font-semibold">EduGame</span></span>}
+          title={<span className="font-light text-foreground tracking-tighter">Bem-vindo ao <span className="font-semibold">Civilize AI</span></span>}
           description="Acesse sua conta e continue sua jornada de aprendizado gamificada"
           heroImageSrc="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=2160&q=80"
           testimonials={testimonials}
@@ -332,7 +332,7 @@ export default function App() {
       <>
         <AccessibilityTools />
         <SignUpPage
-          title={<span className="font-light text-foreground tracking-tighter">Bem-vindo ao <span className="font-semibold">EduGame</span></span>}
+          title={<span className="font-light text-foreground tracking-tighter">Bem-vindo ao <span className="font-semibold">Civilize AI</span></span>}
           description="Crie sua conta e comece sua jornada de aprendizado gamificada"
           heroImageSrc="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=2160&q=80"
           testimonials={testimonials}

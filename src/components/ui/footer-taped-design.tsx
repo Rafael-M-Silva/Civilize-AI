@@ -30,7 +30,7 @@ export const FooterTapedDesign = ({ className }: FooterTapedDesignProps) => {
               href="/"
               className="flex flex-row gap-1 items-center justify-start font-extrabold text-base-content"
             >
-              EduGame
+               Civilize AI
             </a>
             <p className='text-neutral/50 font-medium w-full md:w-4/5'>Plataforma gamificada de aprendizagem para transformar conhecimento em ação.</p>
           </div>

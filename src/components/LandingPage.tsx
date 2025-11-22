@@ -1,12 +1,15 @@
-import { Button } from './ui/button';
-import { Card, CardContent } from './ui/card';
-import { Badge } from './ui/badge';
 import { ContainerScroll } from './ui/container-scroll-animation';
 import { Timeline } from './ui/timeline';
 import { TestimonialsColumn } from './ui/testimonials-columns-1';
 import { GlowingEffect } from './ui/glowing-effect';
 import DatabaseWithRestApi from './ui/database-with-rest-api';
 import { FooterTapedDesign } from './ui/footer-taped-design';
+import { SvgFollowScroll } from './ui/svg-follow-scroll';
+import { Button } from './ui/button';
+import { FlowHoverButton } from './ui/flow-hover-button';
+import { Card, CardContent } from './ui/card';
+import { Badge } from './ui/badge';
+import { TextLoop } from './ui/text-loop';
 import { 
   BookOpen, 
   Trophy, 
@@ -24,11 +27,15 @@ import {
   Lightbulb,
   MessageSquare,
   GraduationCap,
-  TrendingUp
+  TrendingUp,
+  Menu,
+  X
 } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
+import logoAralize from 'figma:asset/e7c68171915ceb3c591a71757fda4ab4b592daed.png';
 
 interface LandingPageProps {
   onLogin: () => void;
@@ -136,75 +143,114 @@ export function LandingPage({ onLogin }: LandingPageProps) {
   const secondColumn = testimonials.slice(3, 6);
   const thirdColumn = testimonials.slice(6, 9);
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-[rgb(255,255,255)]">
+    <div className="min-h-screen bg-[#F0F1FA]">
       {/* Navigation */}
-      <header className="fixed top-5 left-1/2 -translate-x-1/2 w-[70%] z-50 border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-2xl">
-        <div className="container mx-auto px-4 py-4">
+      <header className="sticky top-0 left-0 right-0 mb-[20px] w-[90%] mx-auto z-50 border border-white/20 backdrop-blur-md supports-[backdrop-filter]:bg-white/5 rounded-[100px]">
+        <div className="container mx-auto p-[16px] rounded-[100px]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-                <BookOpen className="h-6 w-6 text-primary-foreground" />
-              </div>
-              <span>Civilize AI</span>
+              <ImageWithFallback
+                src={logoAralize}
+                alt="Logo Civilize AI"
+                className="h-15 w-15 object-cover"
+              />
+              <span className="text-[20px] font-bold">Civilize AI</span>
             </div>
-            <div className="flex items-center gap-4">
-              <Button variant="ghost">Sobre</Button>
-              <Button variant="ghost">Cursos</Button>
-              <Button onClick={onLogin}>
-                Login
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
+            
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center gap-4">
+              <FlowHoverButton onClick={onLogin} icon={<ArrowRight className="h-4 w-4" />} className="rounded-full border-0 bg-white">
+                Começe Agora
+              </FlowHoverButton>
+              <FlowHoverButton onClick={onLogin} icon={<ArrowRight className="h-4 w-4" />} className="rounded-full border-0 bg-white">
+                Já Tenho uma Conta
+              </FlowHoverButton>
             </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6 text-foreground" />
+              ) : (
+                <Menu className="h-6 w-6 text-foreground" />
+              )}
+            </button>
           </div>
+
+          {/* Mobile Dropdown Menu */}
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="md:hidden mt-4 pt-4 border-t border-white/20 flex flex-col gap-3"
+            >
+              <FlowHoverButton onClick={onLogin} icon={<ArrowRight className="h-4 w-4" />} className="rounded-full border-0 bg-white w-full justify-center">
+                Começe Agora
+              </FlowHoverButton>
+              <FlowHoverButton onClick={onLogin} icon={<ArrowRight className="h-4 w-4" />} className="rounded-full border-0 bg-white w-full justify-center">
+                Já Tenho uma Conta
+              </FlowHoverButton>
+            </motion.div>
+          )}
         </div>
       </header>
 
       {/* Hero Section with Scroll Animation */}
-      <ContainerScroll
-        titleComponent={
-          <div className="space-y-6">
-            <Badge className="mx-auto w-fit gap-2">
-              <Sparkles className="h-3 w-3" />
-              Plataforma Gamificada de Aprendizado
-            </Badge>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl max-w-4xl mx-auto leading-tight">
-              Aprenda, Compete e
-              <span className="block text-primary mt-2">
-                Evolua com Gamificação
-              </span>
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Transforme seu aprendizado em uma jornada épica. Ganhe XP, desbloqueie conquistas e suba no ranking enquanto domina novas habilidades.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" onClick={onLogin} className="gap-2">
-                <Zap className="h-5 w-5" />
-                Começar Gratuitamente
-              </Button>
-              <Button size="lg" variant="outline">
-                Ver Demonstração
-              </Button>
+      <div>
+        <ContainerScroll
+          titleComponent={
+            <div className="space-y-6 z-10">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-center">
+                Sua jornada{' '}
+                <TextLoop interval={3} className="text-primary">
+                  {[
+                    <span key="gamificada">gamificada</span>,
+                    <span key="interativa">interativa</span>,
+                    <span key="transformadora">transformadora</span>
+                  ]}
+                </TextLoop>
+                <br />
+                de formação cívica
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl z-10 mx-auto">
+                A Civilize.ai é uma plataforma gamificada que, em quatro etapas, transforma qualquer pessoa em protagonista da democracia.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 z-10">
+                <FlowHoverButton onClick={onLogin} icon={<Zap className="h-5 w-5" />} className="px-8 py-3 text-base rounded-full border-0 bg-white">
+                  Começar Gratuitamente
+                </FlowHoverButton>
+              </div>
             </div>
-          </div>
-        }
-      >
-        <ImageWithFallback
-          src="https://images.unsplash.com/photo-1673515335586-f9f662c01482?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1400"
-          alt="EduGame Platform Dashboard"
-          className="mx-auto rounded-2xl object-cover h-full w-full object-center"
-        />
-      </ContainerScroll>
+          }
+        >
+          <ImageWithFallback
+            src="https://images.unsplash.com/photo-1673515335586-f9f662c01482?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1400"
+            alt="EduGame Platform Dashboard"
+            className="relative mx-auto rounded-2xl object-cover h-full w-full object-center z-10"
+          />
+        </ContainerScroll>
+      </div>
+
+      {/* SVG Follow Scroll Effect */}
+      <SvgFollowScroll />
 
       {/* Timeline Section */}
-      <section className="py-20 pt-[80px] pr-[0px] pb-[0px] pl-[0px]">
+      <section className="py-20 pt-[80px] pr-[0px] pb-[0px] pl-[0px] bg-[##F0F1FA]">
         <Timeline data={[
           {
             title: "Etapa 1",
             content: (
               <div>
                 <div className="mb-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary mb-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ backgroundColor: '#3283FF20', color: '#3283FF' }}>
                     <Video className="h-4 w-4" />
                     <span className="text-sm">Aprenda</span>
                   </div>
@@ -213,7 +259,8 @@ export function LandingPage({ onLogin }: LandingPageProps) {
                   <strong>Assista aos cursos em vídeo</strong>
                 </p>
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base mb-8">
-                  Comece sua jornada assistindo aulas em vídeo de alta qualidade. Aprenda no seu ritmo, pause quando precisar e revise quantas vezes quiser. Cada módulo é cuidadosamente estruturado para maximizar seu aprendizado.
+                  Cursos rápidos, simples e divertidos.
+A IA transforma projetos de lei, políticas públicas e dados oficiais em conteúdos curtos, em linguagem acessível.
                 </p>
                 <div className="grid grid-cols-2 gap-4">
                   <ImageWithFallback
@@ -223,16 +270,16 @@ export function LandingPage({ onLogin }: LandingPageProps) {
                   />
                   <div className="flex flex-col justify-center p-4 bg-muted rounded-lg">
                     <div className="flex items-center gap-2 mb-3">
-                      <BookOpen className="h-5 w-5 text-primary" />
-                      <p className="text-sm">10+ Cursos</p>
+                      <BookOpen className="h-5 w-5" style={{ color: '#3283FF' }} />
+                      <p className="text-sm">O que é um Projeto de Lei?</p>
                     </div>
                     <div className="flex items-center gap-2 mb-3">
-                      <Video className="h-5 w-5 text-primary" />
-                      <p className="text-sm">50+ Vídeos</p>
+                      <Video className="h-5 w-5" style={{ color: '#3283FF' }} />
+                      <p className="text-sm">Como o Congresso funciona?</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Target className="h-5 w-5 text-primary" />
-                      <p className="text-sm">Aprenda no seu ritmo</p>
+                      <Target className="h-5 w-5" style={{ color: '#3283FF' }} />
+                      <p className="text-sm">Orçamento público em 5 minutos.</p>
                     </div>
                   </div>
                 </div>
@@ -244,7 +291,7 @@ export function LandingPage({ onLogin }: LandingPageProps) {
             content: (
               <div>
                 <div className="mb-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 mb-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ backgroundColor: '#3283FF20', color: '#3283FF' }}>
                     <Brain className="h-4 w-4" />
                     <span className="text-sm">Pratique</span>
                   </div>
@@ -253,23 +300,23 @@ export function LandingPage({ onLogin }: LandingPageProps) {
                   <strong>Teste seus conhecimentos</strong>
                 </p>
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base mb-8">
-                  Após cada módulo, faça quizzes interativos para testar o que aprendeu. Receba feedback instantâneo, ganhe XP e desbloqueie novos conteúdos. Cada acerto te aproxima do próximo nvel!
+                  Quizzes, desafios e jogos de simulação para treinar a cidadania na prática.
                 </p>
                 <div className="mb-8">
                   <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    Feedback instantâneo em cada questão
+                    <CheckCircle2 className="h-5 w-5" style={{ color: '#E3C545' }} />
+                    Simule o voto de um deputado
                   </div>
                   <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    Ganhe XP ao acertar as respostas
+                    <CheckCircle2 className="h-5 w-5" style={{ color: '#E3C545' }} />
+                    Quiz de direitos (fácil → médio → difícil)
                   </div>
                   <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    Desbloqueie badges por performance perfeita
+                    <CheckCircle2 className="h-5 w-5" style={{ color: '#E3C545' }} />
+                    Desafios para identificar problemas reais na sua cidade
                   </div>
                   <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base">
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    <CheckCircle2 className="h-5 w-5" style={{ color: '#E3C545' }} />
                     Avance para novos módulos e cursos
                   </div>
                 </div>
@@ -279,8 +326,8 @@ export function LandingPage({ onLogin }: LandingPageProps) {
                     alt="Conquista e certificado"
                     className="rounded-lg object-cover h-32 md:h-44 lg:h-60 w-full shadow-lg"
                   />
-                  <div className="flex flex-col justify-center p-4 bg-gradient-to-br from-primary/10 to-blue-500/10 rounded-lg">
-                    <Trophy className="h-12 w-12 text-primary mb-3" />
+                  <div className="flex flex-col justify-center p-4 rounded-lg" style={{ background: 'linear-gradient(to bottom right, #E3C54520, #E3C54530)' }}>
+                    <Trophy className="h-12 w-12 mb-3" style={{ color: '#E3C545' }} />
                     <p className="text-sm mb-1">Ganhe até</p>
                     <p className="text-2xl mb-1">100 XP</p>
                     <p className="text-xs text-muted-foreground">por quiz perfeito</p>
@@ -294,7 +341,7 @@ export function LandingPage({ onLogin }: LandingPageProps) {
             content: (
               <div>
                 <div className="mb-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 text-purple-500 mb-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ backgroundColor: '#FF2A1D20', color: '#FF2A1D' }}>
                     <Award className="h-4 w-4" />
                     <span className="text-sm">Conquiste</span>
                   </div>
@@ -303,7 +350,8 @@ export function LandingPage({ onLogin }: LandingPageProps) {
                   <strong>Receba certificados e badges</strong>
                 </p>
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base mb-8">
-                  Complete cursos e conquiste certificados oficiais. Desbloqueie badges especiais ao atingir marcos importantes. Mostre suas conquistas no seu perfil e compartilhe com o mundo!
+                  Cada aula e cada desafio rendem XP, medalhas e badges – como no Duolingo, mas para cidadania.
+Seu progresso vira:
                 </p>
                 <div className="grid grid-cols-2 gap-4">
                   <ImageWithFallback
@@ -325,7 +373,7 @@ export function LandingPage({ onLogin }: LandingPageProps) {
             content: (
               <div>
                 <div className="mb-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 text-green-500 mb-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ backgroundColor: '#FF2A1D20', color: '#FF2A1D' }}>
                     <Lightbulb className="h-4 w-4" />
                     <span className="text-sm">Contribua</span>
                   </div>
@@ -334,35 +382,35 @@ export function LandingPage({ onLogin }: LandingPageProps) {
                   <strong>Faça a diferença na Ouvidoria</strong>
                 </p>
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base mb-8">
-                  Chegou ao topo da sua jornada! Agora é hora de compartilhar suas ideias e feedback na ouvidoria. Suas sugestões podem melhorar a plataforma para milhares de estudantes. Seja parte da evolução do EduGame!
+                  A grande virada: sair da teoria e ir para a ação.
                 </p>
                 <div className="mb-8">
                   <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
-                    <MessageSquare className="h-5 w-5 text-primary" />
-                    Compartilhe suas ideias e sugestões
+                    <MessageSquare className="h-5 w-5" style={{ color: '#FF2A1D' }} />
+                    Integração com iniciativas de governo aberto (como o Brasil Participa)
                   </div>
                   <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
-                    <Lightbulb className="h-5 w-5 text-primary" />
-                    Proponha novos cursos e recursos
+                    <Lightbulb className="h-5 w-5" style={{ color: '#FF2A1D' }} />
+                    Convites para consultas públicas e audiências
                   </div>
                   <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
-                    <Users className="h-5 w-5 text-primary" />
-                    Ajude a comunidade a crescer
+                    <Users className="h-5 w-5" style={{ color: '#FF2A1D' }} />
+                    Badges reais por participação em processos oficiais
                   </div>
                   <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base">
-                    <Star className="h-5 w-5 text-primary" />
-                    Tenha voz ativa na plataforma
+                    <Star className="h-5 w-5" style={{ color: '#E3C545' }} />
+                    Seu histórico de estudos se conecta a impacto público mensurável
                   </div>
                 </div>
-                <div className="p-6 bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-lg border-2 border-primary/30">
+                <div className="p-6 rounded-lg border-2" style={{ background: 'linear-gradient(to bottom right, #FF2A1D20, #FF2A1D30)', borderColor: '#FF2A1D50' }}>
                   <div className="flex items-start gap-4">
-                    <MessageSquare className="h-8 w-8 text-primary flex-shrink-0" />
+                    <MessageSquare className="h-8 w-8 flex-shrink-0" style={{ color: '#FF2A1D' }} />
                     <div>
                       <p className="text-base mb-2">
                         <strong>Sua voz importa!</strong>
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        A ouvidoria é o canal direto para você contribuir com ideias que podem transformar a experiência de aprendizado de toda a comunidade EduGame.
+                        Civilize AI é a ponte entre Educação → Ação
                       </p>
                     </div>
                   </div>
@@ -370,11 +418,11 @@ export function LandingPage({ onLogin }: LandingPageProps) {
               </div>
             ),
           },
-        ]} />
+        ]}/>
       </section>
 
       {/* Stats Section with Glowing Effect */}
-      <section className="py-20 border-y bg-muted/30 pt-[80px] pr-[0px] pb-[0px] pl-[0px]">
+      <section className="py-20 bg-[#F0F1FA] pt-[80px] pr-[0px] pb-[0px] pl-[0px]">
         <div className="container mx-auto px-4">
           {/* Header com Badge e Título */}
           <motion.div
@@ -389,12 +437,12 @@ export function LandingPage({ onLogin }: LandingPageProps) {
               Nossos Diferenciais
             </h2>
             <p className="text-center mt-4 text-muted-foreground max-w-2xl">
-              Unindo tecnologia e inteligência artificial em parceria com a educação para transformar a sociedade
+              Por que a Civilize AI é diferente?
             </p>
           </motion.div>
 
           {/* Layout: Ecosystem à esquerda + Cards à direita */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-[0px] pr-[0px] pb-[50px] pl-[0px]">
             {/* Componente DatabaseWithRestApi - Ecossistema */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -446,10 +494,10 @@ export function LandingPage({ onLogin }: LandingPageProps) {
                       </div>
                       <div className="space-y-3">
                         <h3 className="pt-0.5 text-xl leading-[1.375rem] tracking-[-0.04em] md:text-2xl md:leading-[1.875rem] text-balance text-foreground">
-                          10+ Cursos Disponíveis
+                          IA para simplificação legislativa
                         </h3>
                         <h2 className="text-sm leading-[1.125rem] md:text-base md:leading-[1.375rem] text-muted-foreground">
-                          Navegue por uma biblioteca completa de cursos em programação, design, marketing digital e muito mais.
+                          Traduzimos juridiquês em linguagem simples, mostrando “o que isso muda na sua vida.
                         </h2>
                       </div>
                     </div>
@@ -475,10 +523,10 @@ export function LandingPage({ onLogin }: LandingPageProps) {
                       </div>
                       <div className="space-y-3">
                         <h3 className="pt-0.5 text-xl leading-[1.375rem] tracking-[-0.04em] md:text-2xl md:leading-[1.875rem] text-balance text-foreground">
-                          50+ Módulos de Aprendizado
+                          Trilhas personalizadas
                         </h3>
                         <h2 className="text-sm leading-[1.125rem] md:text-base md:leading-[1.375rem] text-muted-foreground">
-                          Conteúdo estruturado em módulos progressivos com vídeo-aulas de alta qualidade para maximizar seu aprendizado.
+                          A IA monta percursos de aprendizagem de acordo com o seu nível, interesses e região.
                         </h2>
                       </div>
                     </div>
@@ -504,10 +552,10 @@ export function LandingPage({ onLogin }: LandingPageProps) {
                       </div>
                       <div className="space-y-3">
                         <h3 className="pt-0.5 text-xl leading-[1.375rem] tracking-[-0.04em] md:text-2xl md:leading-[1.875rem] text-balance text-foreground">
-                          1000+ Estudantes Ativos
+                          Gamificação com impacto real
                         </h3>
                         <h2 className="text-sm leading-[1.125rem] md:text-base md:leading-[1.375rem] text-muted-foreground">
-                          Faça parte de uma comunidade crescente de estudantes engajados competindo no ranking e conquistando badges.
+                          Pontos, badges e rankings não são só números: eles refletem participação em consultas públicas, audiências e votações oficiais.
                         </h2>
                       </div>
                     </div>
@@ -533,10 +581,10 @@ export function LandingPage({ onLogin }: LandingPageProps) {
                       </div>
                       <div className="space-y-3">
                         <h3 className="pt-0.5 text-xl leading-[1.375rem] tracking-[-0.04em] md:text-2xl md:leading-[1.875rem] text-balance text-foreground">
-                          95% Taxa de Satisfação
+                          Conexão com governo aberto
                         </h3>
                         <h2 className="text-sm leading-[1.125rem] md:text-base md:leading-[1.375rem] text-muted-foreground">
-                          Nossos estudantes adoram a experiência gamificada. Sistema de XP, quizzes interativos e certificados ao final.
+                          Integramos dados e iniciativas de Senado, Câmara, TSE, Querido Diário e plataformas de participação social.
                         </h2>
                       </div>
                     </div>
@@ -549,7 +597,7 @@ export function LandingPage({ onLogin }: LandingPageProps) {
       </section>
 
       {/* Testimonials Section */}
-      <section className="bg-background my-20 relative">
+      <section className="bg-[#F0F1FA] my-20 relative">
         <div className="container z-10 mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -579,38 +627,25 @@ export function LandingPage({ onLogin }: LandingPageProps) {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-[rgb(246,57,60)] text-primary-foreground">
+      <section className="py-20 bg-[rgb(240,241,250)] text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl mb-4">
+          <h2 className="text-3xl md:text-4xl mb-4 text-[rgb(39,39,42)]">
             Pronto para começar sua jornada?
           </h2>
-          <p className="text-lg mb-8 opacity-90 max-w-2xl mx-auto">
+          <p className="text-lg mb-8 opacity-90 max-w-2xl mx-auto text-[rgb(39,39,42)]">
             Junte-se a milhares de estudantes que já estão transformando seu aprendizado em uma aventura gamificada.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" onClick={onLogin} className="gap-2">
-              <Zap className="h-5 w-5" />
+            <FlowHoverButton onClick={onLogin} icon={<Zap className="h-5 w-5" />} className="px-8 py-3 text-base rounded-full border-0 bg-white">
               Começar Gratuitamente
-            </Button>
-            <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10">
-              Falar com Vendas
-            </Button>
+            </FlowHoverButton>
           </div>
-          <div className="flex items-center justify-center gap-6 mt-8 text-sm opacity-80">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4" />
-              Sem cartão de crédito
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4" />
-              Cancele quando quiser
-            </div>
-          </div>
+      
         </div>
       </section>
 
       {/* Footer */}
-      <FooterTapedDesign className="w-[100%] px-8 py-10 mx-auto bg-[rgb(255,255,255)] bg-[rgb(215,212,212)]" />
+      <FooterTapedDesign className="w-[100%] px-8 py-10 mx-auto bg-[#F0F1FA]" />
     </div>
   );
 }
