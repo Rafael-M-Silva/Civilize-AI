@@ -23,6 +23,7 @@ interface OnboardingFlowProps {
 export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [showFirstLesson, setShowFirstLesson] = useState(false);
+  const [showCongratulations, setShowCongratulations] = useState(false);
   const [videoWatched, setVideoWatched] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<string[]>([]);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
@@ -333,14 +334,113 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
       }
     });
     
+    // Mostrar tela de parabéns
+    setShowCongratulations(true);
+  };
+
+  const handleGoToDashboard = () => {
     // Completar o onboarding
     onComplete(onboardingData);
   };
-
+  
   const canCompleteLesson = videoWatched && 
     quizAnswers[0] !== undefined && quizAnswers[0] !== '' &&
     quizAnswers[1] !== undefined && quizAnswers[1] !== '' &&
     quizAnswers[2] !== undefined && quizAnswers[2] !== '';
+
+  // Tela de parabéns
+  if (showCongratulations) {
+    return (
+      <div className="min-h-screen bg-[#68A4FF] flex items-center justify-center p-4">
+        <motion.div
+          className="w-full max-w-2xl"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, type: "spring" }}
+        >
+          <div className="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl p-8 md:p-12 text-center">
+            {/* Mascote comemorando */}
+            <motion.div
+              className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#82F690] to-[#45F45A] p-2"
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                repeatDelay: 1,
+              }}
+            >
+              <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
+                <ImageWithFallback
+                  src={image_daff672e48b6bae4cae7f3fe67ed448e6a653de1}
+                  alt="Aralize - Mascote Papagaio"
+                  className="w-full h-full object-cover rounded-full p-1"
+                />
+              </div>
+            </motion.div>
+
+            {/* Título */}
+            <motion.h1
+              className="text-4xl md:text-5xl font-bold text-foreground mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              Parabéns, {onboardingData.preferredName}!
+            </motion.h1>
+
+            {/* Mensagem */}
+            <motion.p
+              className="text-xl text-muted-foreground mb-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              Você completou sua primeira lição! 🚀
+            </motion.p>
+
+            <motion.p
+              className="text-lg text-muted-foreground mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              Está pronto para começar sua jornada cidadã na Civilize AI?
+            </motion.p>
+
+            {/* Estatísticas */}
+            <motion.div
+              className="flex justify-center gap-6 mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <div className="bg-gradient-to-br from-[#3283FF]/10 to-[#3283FF]/20 rounded-2xl p-4 min-w-[120px]">
+                <div className="text-3xl font-bold text-[#3283FF]">+50 XP</div>
+                <div className="text-sm text-muted-foreground">Experiência</div>
+              </div>
+              <div className="bg-gradient-to-br from-[#E3C545]/10 to-[#E3C545]/20 rounded-2xl p-4 min-w-[120px]">
+                <div className="text-3xl font-bold text-[#E3C545]">🏆</div>
+                <div className="text-sm text-muted-foreground">1ª Lição</div>
+              </div>
+            </motion.div>
+
+            {/* Botão */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <FlowHoverButton
+                onClick={handleGoToDashboard}
+                className="w-auto rounded-[100px] px-[40px] py-[16px] text-lg mx-auto"
+              >
+                Começar Minha Jornada Agora
+              </FlowHoverButton>
+            </motion.div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   // Se deve mostrar a primeira aula
   if (showFirstLesson) {

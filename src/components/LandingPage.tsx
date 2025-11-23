@@ -1,3 +1,9 @@
+import image_76baa3749f46981f4dcb9ee7247adb7105d55858 from 'figma:asset/76baa3749f46981f4dcb9ee7247adb7105d55858.png';
+import image_f75a8eafcdf4c20aaad1f13cff07aac299871473 from 'figma:asset/f75a8eafcdf4c20aaad1f13cff07aac299871473.png';
+import image_1510322d28f519a6d96a01426a3cc3cf67d82ad7 from 'figma:asset/1510322d28f519a6d96a01426a3cc3cf67d82ad7.png';
+import image_dd64a0b95b79e3ee74344f9563faf53b1224f74d from 'figma:asset/dd64a0b95b79e3ee74344f9563faf53b1224f74d.png';
+import image_8cd44a66feb1d956f624b7bbc1ce5fe9d9ec464f from 'figma:asset/8cd44a66feb1d956f624b7bbc1ce5fe9d9ec464f.png';
+import image_3655b414756a692dae3da879e2473c2583463bed from 'figma:asset/3655b414756a692dae3da879e2473c2583463bed.png';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
@@ -44,9 +50,13 @@ import {
 
 interface LandingPageProps {
   onLogin: () => void;
+  onSignUp: () => void;
+  onFAQClick?: () => void;
+  onTermsClick?: () => void;
+  onPrivacyClick?: () => void;
 }
 
-export function LandingPage({ onLogin }: LandingPageProps) {
+export function LandingPage({ onLogin, onSignUp, onFAQClick, onTermsClick, onPrivacyClick }: LandingPageProps) {
   const features = [
     {
       icon: BookOpen,
@@ -179,7 +189,7 @@ export function LandingPage({ onLogin }: LandingPageProps) {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+              className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? (
@@ -235,10 +245,10 @@ export function LandingPage({ onLogin }: LandingPageProps) {
                 </FlowHoverButton>
               </div>
             </div>
-          } className="font-[Inter]"
+          } 
         >
           <ImageWithFallback
-            src="https://images.unsplash.com/photo-1673515335586-f9f662c01482?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1400"
+            src={image_76baa3749f46981f4dcb9ee7247adb7105d55858}
             alt="EduGame Platform Dashboard"
             className="relative mx-auto rounded-2xl object-cover h-full w-full object-center z-10"
           />
@@ -678,7 +688,12 @@ Seu progresso vira:
       </section>
 
       {/* Footer */}
-      <FooterTapedDesign className="w-[100%] px-8 py-10 mx-auto bg-[#F0F1FA]" />
+      <FooterTapedDesign 
+        className="w-[100%] px-8 py-10 mx-auto bg-[#F0F1FA]" 
+        onFAQClick={onFAQClick}
+        onTermsClick={onTermsClick}
+        onPrivacyClick={onPrivacyClick}
+      />
     </div>
   );
 }

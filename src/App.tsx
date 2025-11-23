@@ -1,3 +1,7 @@
+import { OnboardingFlow } from './components/OnboardingFlow';
+import lizeCoinIcon from 'figma:asset/085fc565bb4f512d3e3f3cfb35b8d2b508a6879f.png';
+import logoAralize from 'figma:asset/e7c68171915ceb3c591a71757fda4ab4b592daed.png';
+import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import { useState, useEffect } from 'react';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
@@ -13,7 +17,8 @@ import {
   Target,
   Menu,
   X,
-  LogOut
+  LogOut,
+  Coins
 } from 'lucide-react';
 import { Dashboard } from './components/Dashboard';
 import { CourseViewer } from './components/CourseViewer';
@@ -25,10 +30,13 @@ import { Leaderboard } from './components/Leaderboard';
 import { LandingPage } from './components/LandingPage';
 import { SignInPage, Testimonial } from './components/ui/sign-in';
 import { SignUpPage } from './components/ui/sign-up';
-import { OnboardingFlow } from './components/OnboardingFlow';
-import { AccessibilityTools } from './components/AccessibilityTools';
+import { ResetPasswordPage } from './components/ui/reset-password';
+import { FAQPage } from './components/FAQPage';
+import { TermsPage } from './components/TermsPage';
+import { PrivacyPage } from './components/PrivacyPage';
+import { Course, Badge as BadgeType, UserProgress, Quiz as QuizType, LeaderboardEntry } from './lib/types';
 import { mockCourses, allBadges, mockLeaderboard } from './lib/mockData';
-import { Course, UserProgress, Badge as BadgeType, Quiz as QuizType } from './lib/types';
+import { AccessibilityTools } from './components/AccessibilityTools';
 
 type View = 'dashboard' | 'course' | 'quiz' | 'profile' | 'progress' | 'badges' | 'leaderboard';
 
@@ -49,8 +57,13 @@ function AppContent() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [showFAQ, setShowFAQ] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [userPreferredName, setUserPreferredName] = useState('');
+  const [userInterests, setUserInterests] = useState<string[]>([]);
   const [googleUser, setGoogleUser] = useState<GoogleUser | null>(null);
   
   const [currentView, setCurrentView] = useState<View>('dashboard');
@@ -61,6 +74,8 @@ function AppContent() {
   // User state
   const [userXp, setUserXp] = useState(850);
   const [userLevel, setUserLevel] = useState(4);
+  const [userCoins, setUserCoins] = useState(150); // LizeCoins iniciais
+  const [unlockedCourses, setUnlockedCourses] = useState<string[]>([]); // Cursos desbloqueados pelo usuário
   const [userProgress, setUserProgress] = useState<UserProgress[]>([
     {
       courseId: 'course-1',
@@ -157,11 +172,17 @@ function AppContent() {
   const handleModuleComplete = (moduleId: string) => {
     if (!selectedCourseId) return;
 
+    const COINS_PER_MODULE = 25; // Recompensa de 25 LizeCoins por módulo
+
     setUserProgress(prev => prev.map(progress => {
       if (progress.courseId === selectedCourseId && !progress.modulesCompleted.includes(moduleId)) {
         const updatedModules = [...progress.modulesCompleted, moduleId];
         const course = courses.find(c => c.id === selectedCourseId);
         const isCompleted = course ? updatedModules.length === course.totalModules : false;
+
+        // Adicionar LizeCoins ao completar módulo
+        setUserCoins(prev => prev + COINS_PER_MODULE);
+        console.log(`🪙 +${COINS_PER_MODULE} LizeCoins por completar o módulo!`);
 
         return {
           ...progress,
@@ -207,15 +228,17 @@ function AppContent() {
     }
   };
 
-  const handleQuizComplete = (score: number, xpEarned: number, isPerfect: boolean) => {
+  const handleQuizComplete = (score: number, xpEarned: number, isPerfect: boolean, passed: boolean) => {
     if (!currentQuiz || !selectedCourseId) return;
 
-    // Add XP
-    setUserXp(prev => prev + xpEarned);
+    // Add XP only if passed
+    if (passed) {
+      setUserXp(prev => prev + xpEarned);
+    }
 
-    // Update progress
+    // Update progress - only mark quiz as completed if passed
     setUserProgress(prev => prev.map(progress => {
-      if (progress.courseId === selectedCourseId && !progress.quizzesCompleted.includes(currentQuiz.id)) {
+      if (progress.courseId === selectedCourseId && passed && !progress.quizzesCompleted.includes(currentQuiz.id)) {
         return {
           ...progress,
           quizzesCompleted: [...progress.quizzesCompleted, currentQuiz.id],
@@ -226,7 +249,7 @@ function AppContent() {
     }));
 
     // Unlock perfect score badge
-    if (isPerfect) {
+    if (isPerfect && passed) {
       setBadges(prev => prev.map(badge => {
         if (badge.id === 'badge-3' && !badge.unlocked) {
           return { ...badge, unlocked: true, unlockedAt: new Date() };
@@ -244,6 +267,16 @@ function AppContent() {
   const handleCourseBack = () => {
     setSelectedCourseId(null);
     setCurrentView('dashboard');
+  };
+
+  const handleUnlockCourse = (courseId: string, price: number) => {
+    if (userCoins >= price) {
+      setUserCoins(prev => prev - price);
+      setUnlockedCourses(prev => [...prev, courseId]);
+      console.log(`✅ Curso ${courseId} desbloqueado por ${price} LizeCoins!`);
+    } else {
+      alert(`Você precisa de ${price - userCoins} LizeCoins adicionais para desbloquear este curso.`);
+    }
   };
 
   const selectedCourse = courses.find(c => c.id === selectedCourseId);
@@ -385,6 +418,7 @@ function AppContent() {
   const handleOnboardingComplete = (data: any) => {
     console.log("Onboarding completed:", data);
     setUserPreferredName(data.preferredName);
+    setUserInterests(data.interests);
     setNeedsOnboarding(false);
     // Here you would save the user preferences to your backend
     // For now, we'll just log them
@@ -398,18 +432,21 @@ function AppContent() {
         <SignInPage
           title={<span className="font-light text-foreground tracking-tighter">Bem-vindo ao <span className="font-semibold">Civilize AI</span></span>}
           description="Acesse sua conta e continue sua jornada de aprendizado gamificada"
-          heroImageSrc="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=2160&q=80"
+          heroImageSrc="https://images.unsplash.com/photo-1664545141018-c70ca9e78a76?q=80&w=1025&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           testimonials={testimonials}
           onSignIn={handleSignIn}
           onGoogleSignIn={handleGoogleSignIn}
-          onResetPassword={() => alert("Reset Password clicked")}
+          onResetPassword={() => {
+            setShowLogin(false);
+            setShowResetPassword(true);
+          }}
           onCreateAccount={() => {
             setShowLogin(false);
             setShowSignUp(true);
           }}
           onBackToHome={() => {
             setShowLogin(false);
-          }}
+          }} className="underline"
         />
       </>
     );
@@ -423,7 +460,7 @@ function AppContent() {
         <SignUpPage
           title={<span className="font-light text-foreground tracking-tighter">Bem-vindo ao <span className="font-semibold">Civilize AI</span></span>}
           description="Crie sua conta e comece sua jornada de aprendizado gamificada"
-          heroImageSrc="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=2160&q=80"
+          heroImageSrc="https://images.unsplash.com/photo-1664545141018-c70ca9e78a76?q=80&w=1025&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           testimonials={testimonials}
           onSignUp={handleSignUp}
           onGoogleSignUp={handleGoogleSignUp}
@@ -439,12 +476,71 @@ function AppContent() {
     );
   }
 
+  // Show reset password page if reset password button was clicked
+  if (showResetPassword && !isLoggedIn) {
+    return (
+      <>
+        <AccessibilityTools />
+        <ResetPasswordPage
+          title={<span className="font-light text-foreground tracking-tighter">Redefinir <span className="font-semibold">Senha</span></span>}
+          description="Enviaremos um link de redefinição para o seu e-mail"
+          heroImageSrc="https://images.unsplash.com/photo-1664545141018-c70ca9e78a76?q=80&w=1025&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          testimonials={testimonials}
+          onResetPassword={(email) => {
+            console.log("Reset password for:", email);
+            // Here you would call your backend API to send reset email
+          }}
+          onBackToLogin={() => {
+            setShowResetPassword(false);
+            setShowLogin(true);
+          }}
+        />
+      </>
+    );
+  }
+
+  // Show FAQ page
+  if (showFAQ) {
+    return (
+      <>
+        <AccessibilityTools />
+        <FAQPage onBack={() => setShowFAQ(false)} />
+      </>
+    );
+  }
+
+  // Show Terms page
+  if (showTerms) {
+    return (
+      <>
+        <AccessibilityTools />
+        <TermsPage onBack={() => setShowTerms(false)} />
+      </>
+    );
+  }
+
+  // Show Privacy page
+  if (showPrivacy) {
+    return (
+      <>
+        <AccessibilityTools />
+        <PrivacyPage onBack={() => setShowPrivacy(false)} />
+      </>
+    );
+  }
+
   // Show landing page if not logged in
   if (!isLoggedIn) {
     return (
       <>
         <AccessibilityTools />
-        <LandingPage onLogin={() => setShowLogin(true)} onSignUp={() => setShowSignUp(true)} />
+        <LandingPage 
+          onLogin={() => setShowLogin(true)} 
+          onSignUp={() => setShowSignUp(true)}
+          onFAQClick={() => setShowFAQ(true)}
+          onTermsClick={() => setShowTerms(true)}
+          onPrivacyClick={() => setShowPrivacy(true)}
+        />
       </>
     );
   }
@@ -465,12 +561,21 @@ function AppContent() {
       <AccessibilityTools />
       
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 bg-[rgba(249,249,249,0.12)]">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <BookOpen className="h-6 w-6 text-primary" />
-              <h1>EduGame</h1>
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => {
+              setCurrentView('dashboard');
+              setSelectedCourseId(null);
+              setCurrentQuiz(null);
+              setMobileMenuOpen(false);
+            }}>
+              <ImageWithFallback 
+                src={logoAralize} 
+                alt="Logo Civilize AI" 
+                className="h-8 w-8 object-contain" 
+              />
+              <h1 className="font-bold">Civilize AI</h1>
             </div>
 
             {/* Desktop Navigation */}
@@ -493,13 +598,21 @@ function AppContent() {
 
             {/* User Info */}
             <div className="hidden md:flex items-center gap-4">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 bg-[rgba(0,0,0,0.15)]">
                 <Trophy className="h-4 w-4 text-primary" />
                 <span className="text-sm">Nível {userLevel}</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10 bg-[rgba(0,0,0,0.15)]">
                 <Target className="h-4 w-4 text-blue-500" />
                 <span className="text-sm">{userXp.toLocaleString()} XP</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-yellow-500/10 bg-[rgba(0,0,0,0.15)]">
+                <ImageWithFallback
+                  src={lizeCoinIcon}
+                  alt="LizeCoin"
+                  className="h-5 w-5"
+                />
+                <span className="text-sm">{userCoins.toLocaleString()}</span>
               </div>
               <Avatar>
                 <AvatarImage src={user.avatar} alt={user.name} />
@@ -580,7 +693,11 @@ function AppContent() {
             userProgress={userProgress}
             userXp={userXp}
             userLevel={userLevel}
+            userInterests={userInterests}
+            userCoins={userCoins}
+            unlockedCourses={unlockedCourses}
             onStartCourse={handleStartCourse}
+            onUnlockCourse={handleUnlockCourse}
           />
         )}
 

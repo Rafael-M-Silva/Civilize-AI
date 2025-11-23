@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -40,6 +40,24 @@ export function CourseViewer({
     return 0;
   });
   
+  // Find the furthest module the user can access
+  useEffect(() => {
+    // Find the last unlocked module
+    let lastUnlockedIndex = 0;
+    for (let i = 0; i < course.modules.length; i++) {
+      if (isModuleUnlocked(i)) {
+        lastUnlockedIndex = i;
+      } else {
+        break; // Stop at first locked module
+      }
+    }
+    
+    // If current module is beyond what's unlocked, reset to last unlocked
+    if (currentModuleIndex > lastUnlockedIndex) {
+      setCurrentModuleIndex(lastUnlockedIndex);
+    }
+  }, [userProgress.quizzesCompleted]); // Re-run when quiz completion changes
+  
   const currentModule = course.modules[currentModuleIndex];
   
   // Safety check - if currentModule is undefined, something went wrong
@@ -66,9 +84,16 @@ export function CourseViewer({
     return userProgress.modulesCompleted.includes(moduleId);
   };
 
+  const isQuizCompleted = (moduleId: string) => {
+    const quiz = course.quizzes.find(q => q.moduleId === moduleId);
+    return quiz ? userProgress.quizzesCompleted.includes(quiz.id) : false;
+  };
+
   const isModuleUnlocked = (index: number) => {
     if (index === 0) return true;
-    return isModuleCompleted(course.modules[index - 1].id);
+    // Module is unlocked if the previous module's quiz was completed successfully
+    const previousModuleId = course.modules[index - 1].id;
+    return isQuizCompleted(previousModuleId);
   };
 
   const handleModuleSelect = (index: number) => {
@@ -85,7 +110,11 @@ export function CourseViewer({
 
   const handleNextModule = () => {
     if (currentModuleIndex < course.modules.length - 1) {
-      setCurrentModuleIndex(currentModuleIndex + 1);
+      const nextIndex = currentModuleIndex + 1;
+      // Only allow navigation if the next module is unlocked
+      if (isModuleUnlocked(nextIndex)) {
+        setCurrentModuleIndex(nextIndex);
+      }
     }
   };
 
@@ -181,6 +210,17 @@ export function CourseViewer({
                     </Button>
                   )}
                 </div>
+                
+                {/* Warning message if quiz is not completed */}
+                {isModuleCompleted(currentModule.id) && !isQuizCompleted(currentModule.id) && (
+                  <Card className="bg-yellow-500/10 border-yellow-500">
+                    <CardContent className="pt-4 pb-4">
+                      <p className="text-sm text-yellow-700 dark:text-yellow-400 text-center">
+                        ⚠️ Você precisa acertar pelo menos 3 de 4 questões no quiz para desbloquear o próximo módulo!
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -212,7 +252,7 @@ export function CourseViewer({
                           isCurrent
                             ? 'bg-primary/10 border-primary'
                             : unlocked
-                            ? 'hover:bg-accent border-border'
+                            ? 'hover:bg-accent border-border cursor-pointer'
                             : 'opacity-50 cursor-not-allowed border-border bg-muted/30'
                         }`}
                       >

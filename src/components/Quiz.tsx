@@ -15,7 +15,7 @@ import { Quiz as QuizType } from '@/lib/types';
 
 interface QuizProps {
   quiz: QuizType;
-  onComplete: (score: number, xpEarned: number, isPerfect: boolean) => void;
+  onComplete: (score: number, xpEarned: number, isPerfect: boolean, passed: boolean) => void;
   onBack: () => void;
 }
 
@@ -53,15 +53,17 @@ export function Quiz({ quiz, onComplete, onBack }: QuizProps) {
       ).length + (isCorrect ? 1 : 0);
       
       const score = (correctAnswers / quiz.questions.length) * 100;
-      const xpEarned = quiz.questions.reduce((acc, q, index) => {
+      const passed = score >= 75; // 3 de 4 = 75%
+      
+      const xpEarned = passed ? quiz.questions.reduce((acc, q, index) => {
         const userAnswer = index === currentQuestionIndex ? selectedAnswer : answers[index];
         return acc + (userAnswer === q.correctAnswer ? q.xpReward : 0);
-      }, 0);
+      }, 0) : 0;
       
       const isPerfect = correctAnswers === quiz.questions.length;
       
       setQuizCompleted(true);
-      onComplete(score, xpEarned, isPerfect);
+      onComplete(score, xpEarned, isPerfect, passed);
     } else {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
@@ -83,6 +85,7 @@ export function Quiz({ quiz, onComplete, onBack }: QuizProps) {
   if (quizCompleted) {
     const { correctAnswers, score, xpEarned } = calculateFinalResults();
     const isPerfect = correctAnswers === quiz.questions.length;
+    const passed = score >= 75; // 3 de 4 = 75%
 
     return (
       <div className="max-w-3xl mx-auto space-y-6">
@@ -93,26 +96,26 @@ export function Quiz({ quiz, onComplete, onBack }: QuizProps) {
                 <div className="h-20 w-20 rounded-full bg-yellow-500/20 flex items-center justify-center">
                   <Trophy className="h-10 w-10 text-yellow-500" />
                 </div>
-              ) : score >= 70 ? (
+              ) : passed ? (
                 <div className="h-20 w-20 rounded-full bg-green-500/20 flex items-center justify-center">
                   <CheckCircle2 className="h-10 w-10 text-green-500" />
                 </div>
               ) : (
-                <div className="h-20 w-20 rounded-full bg-blue-500/20 flex items-center justify-center">
-                  <Star className="h-10 w-10 text-blue-500" />
+                <div className="h-20 w-20 rounded-full bg-red-500/20 flex items-center justify-center">
+                  <XCircle className="h-10 w-10 text-red-500" />
                 </div>
               )}
             </div>
             <div>
               <CardTitle className="text-3xl">
-                {isPerfect ? 'Perfeito! 🎉' : score >= 70 ? 'Parabéns! 🎊' : 'Quiz Concluído!'}
+                {isPerfect ? 'Perfeito! 🎉' : passed ? 'Parabéns! Você Passou! 🎊' : 'Não foi dessa vez! 😔'}
               </CardTitle>
               <CardDescription>
                 {isPerfect 
-                  ? 'Você acertou todas as questões!' 
-                  : score >= 70 
-                  ? 'Você foi muito bem neste quiz!' 
-                  : 'Continue praticando para melhorar!'}
+                  ? 'Você acertou todas as questões e desbloqueou o próximo módulo!' 
+                  : passed 
+                  ? 'Você atingiu a nota mínima e desbloqueou o próximo módulo!' 
+                  : 'Você precisa acertar pelo menos 3 de 4 questões (75%) para desbloquear o próximo módulo. Tente novamente!'}
               </CardDescription>
             </div>
           </CardHeader>
@@ -120,19 +123,21 @@ export function Quiz({ quiz, onComplete, onBack }: QuizProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardContent className="pt-6 text-center">
-                  <div className="text-3xl mb-2">{score}%</div>
+                  <div className={`text-3xl mb-2 ${passed ? '' : 'text-red-500'}`}>{score}%</div>
                   <p className="text-sm text-muted-foreground">Pontuação</p>
+                  {!passed && <p className="text-xs text-red-500 mt-1">Mínimo: 75%</p>}
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6 text-center">
-                  <div className="text-3xl mb-2">{correctAnswers}/{quiz.questions.length}</div>
+                  <div className={`text-3xl mb-2 ${passed ? '' : 'text-red-500'}`}>{correctAnswers}/{quiz.questions.length}</div>
                   <p className="text-sm text-muted-foreground">Acertos</p>
+                  {!passed && <p className="text-xs text-red-500 mt-1">Mínimo: 3 acertos</p>}
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6 text-center">
-                  <div className="text-3xl mb-2 text-primary">+{xpEarned}</div>
+                  <div className={`text-3xl mb-2 ${passed ? 'text-primary' : 'text-muted-foreground'}`}>{passed ? `+${xpEarned}` : '0'}</div>
                   <p className="text-sm text-muted-foreground">XP Ganho</p>
                 </CardContent>
               </Card>
@@ -200,7 +205,7 @@ export function Quiz({ quiz, onComplete, onBack }: QuizProps) {
                 if (isSelected) {
                   buttonClass += 'border-primary bg-primary/10';
                 } else {
-                  buttonClass += 'border-border hover:border-primary/50 hover:bg-accent';
+                  buttonClass += 'border-border hover:border-primary/50 hover:bg-accent cursor-pointer';
                 }
               }
 

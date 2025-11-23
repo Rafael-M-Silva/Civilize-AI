@@ -16,6 +16,9 @@ import {
   ExpandableChatFooter,
 } from "./ui/expandable-chat"
 import { ChatMessageList } from "./ui/chat-message-list"
+import mascotIcon from 'figma:asset/202083b6ed83af38db2a8abb9c97b03fe3f569c7.png';
+import chatIcon from 'figma:asset/326f260239805f33c7580f677fb3589bb5334b10.png';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 
 export function ExpandableChatDemo() {
   const [messages, setMessages] = useState([
@@ -81,11 +84,19 @@ export function ExpandableChatDemo() {
     // Funcionalidade de microfone
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit(e as any)
+    }
+  }
+
   return (
     <ExpandableChat
       size="lg"
       position="bottom-right"
-      icon={<Bot className="h-6 w-6" />}
+      icon={<ImageWithFallback src={chatIcon} alt="Chat com Lize" className="h-10 w-10 object-contain" />}
+      className="[&>button]:bg-gray-900 [&>button]:shadow-2xl [&>button]:hover:bg-gray-800 [&>button]:w-20 [&>button]:h-20 [&>button]:rounded-full"
     >
       <ExpandableChatHeader className="flex-col text-center justify-center bg-gradient-to-r from-[#3283FF] to-[#6E9DED]">
         <h1 className="text-xl font-semibold text-white">Chat com Lize ✨</h1>
@@ -101,15 +112,6 @@ export function ExpandableChatDemo() {
               key={message.id}
               variant={message.sender === "user" ? "sent" : "received"}
             >
-              <ChatBubbleAvatar
-                className="h-8 w-8 shrink-0"
-                src={
-                  message.sender === "user"
-                    ? ""
-                    : ""
-                }
-                fallback={message.sender === "user" ? "VC" : "🦜"}
-              />
               <ChatBubbleMessage
                 variant={message.sender === "user" ? "sent" : "received"}
               >
@@ -120,10 +122,6 @@ export function ExpandableChatDemo() {
 
           {isLoading && (
             <ChatBubble variant="received">
-              <ChatBubbleAvatar
-                className="h-8 w-8 shrink-0"
-                fallback="🦜"
-              />
               <ChatBubbleMessage isLoading />
             </ChatBubble>
           )}
@@ -140,6 +138,7 @@ export function ExpandableChatDemo() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Digite sua mensagem..."
             className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
+            onKeyDown={handleKeyDown}
           />
           <div className="flex items-center p-3 pt-0 justify-between">
             <div className="flex">

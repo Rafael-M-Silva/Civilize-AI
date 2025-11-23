@@ -2,8 +2,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
-import { Trophy, Target, BookOpen, Award, Calendar } from 'lucide-react';
+import { Button } from './ui/button';
+import { Trophy, Target, BookOpen, Award, Calendar, Camera, Upload } from 'lucide-react';
 import { User, Course, Badge as BadgeType } from '@/lib/types';
+import { useState, useRef, useEffect } from 'react';
 
 interface UserProfileProps {
   user: User;
@@ -20,18 +22,93 @@ export function UserProfile({ user, courses, badges }: UserProfileProps) {
   const currentLevelXp = user.xp % 200;
   const levelProgress = (currentLevelXp / 200) * 100;
 
+  // Estados para banner e avatar
+  const [bannerImage, setBannerImage] = useState<string>('https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&q=80');
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBannerImage(reader.result as string);
+        // Salvar no localStorage
+        localStorage.setItem('civilizeai_banner', reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Carregar banner do localStorage ao montar - usando useEffect
+  useEffect(() => {
+    const savedBanner = localStorage.getItem('civilizeai_banner');
+    if (savedBanner) {
+      setBannerImage(savedBanner);
+    }
+  }, []);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [newAvatar, setNewAvatar] = useState(user.avatar);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewAvatar(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveAvatar = () => {
+    // Aqui você pode adicionar a lógica para salvar a nova imagem do avatar
+    // Por exemplo, enviar a nova imagem para o servidor
+    setIsEditing(false);
+  };
+
   return (
     <div className="space-y-8">
       {/* Profile Header */}
-      <Card>
+      <Card className="overflow-hidden">
+        {/* Banner de Perfil */}
+        <div className="relative h-48 bg-gradient-to-r from-[#3283FF] via-[#FF2A1D] to-[#E3C545]">
+          <img 
+            src={bannerImage} 
+            alt="Banner de perfil" 
+            className="w-full h-full object-cover"
+          />
+          
+          {/* Botão para trocar o banner */}
+          <Button
+            variant="secondary"
+            size="sm"
+            className="absolute bottom-4 right-4 gap-2"
+            onClick={() => bannerInputRef.current?.click()}
+          >
+            <Camera className="h-4 w-4" />
+            Alterar Banner
+          </Button>
+          
+          {/* Input oculto para upload */}
+          <input
+            ref={bannerInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleBannerChange}
+          />
+        </div>
+
         <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            <Avatar className="h-24 w-24">
+          <div className="flex flex-col md:flex-row items-center gap-6 -mt-16 relative">
+            <Avatar className="h-24 w-24 border-4 border-background">
               <AvatarImage src={user.avatar} alt={user.name} />
               <AvatarFallback className="text-2xl">{user.name.charAt(0)}</AvatarFallback>
             </Avatar>
             
-            <div className="flex-1 text-center md:text-left space-y-2">
+            <div className="flex-1 text-center md:text-left space-y-2 md:mt-12">
               <div>
                 <h1 className="mb-2">{user.name}</h1>
                 <p className="text-muted-foreground">{user.email}</p>
@@ -83,7 +160,7 @@ export function UserProfile({ user, courses, badges }: UserProfileProps) {
 
       {/* Statistics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+        <Card className="border-l-[6px] border-l-[#3283FF]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm">XP Total</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
@@ -96,7 +173,7 @@ export function UserProfile({ user, courses, badges }: UserProfileProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-[6px] border-l-[#E3C545]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm">Módulos Completados</CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
@@ -109,7 +186,7 @@ export function UserProfile({ user, courses, badges }: UserProfileProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-[6px] border-l-[#FF2A1D]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm">Cursos Completos</CardTitle>
             <Trophy className="h-4 w-4 text-muted-foreground" />

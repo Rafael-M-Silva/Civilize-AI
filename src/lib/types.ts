@@ -27,10 +27,13 @@ export interface Course {
   description: string;
   thumbnail: string;
   category: string;
+  interest?: string;
   totalModules: number;
   xpTotal: number;
   modules: Module[];
   quizzes: Quiz[];
+  isFree?: boolean; // Indica se é o curso grátis do usuário
+  coinPrice: number; // Preço em LizeCoins para desbloquear
 }
 
 export interface Badge {
@@ -62,6 +65,8 @@ export interface User {
   level: number;
   badges: Badge[];
   progress: UserProgress[];
+  civilizeCoins: number; // Saldo de LizeCoins
+  unlockedCourses: string[]; // IDs dos cursos desbloqueados
 }
 
 export interface LeaderboardEntry {
