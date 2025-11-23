@@ -2200,6 +2200,10 @@
     padding-inline: calc(var(--spacing) * 8);
   }
 
+  .px-\[16px\] {
+    padding-inline: 16px;
+  }
+
   .px-\[59px\] {
     padding-inline: 59px;
   }
@@ -2242,6 +2246,10 @@
 
   .py-20 {
     padding-block: calc(var(--spacing) * 20);
+  }
+
+  .py-\[10px\] {
+    padding-block: 10px;
   }
 
   .py-\[12px\] {
@@ -2486,6 +2494,10 @@
 
   .whitespace-nowrap {
     white-space: nowrap;
+  }
+
+  .text-\[\#3283FF\] {
+    color: #3283ff;
   }
 
   .text-\[\#FF2A1D\] {
@@ -3048,6 +3060,12 @@
   @media (hover: hover) {
     .hover\:text-foreground:hover {
       color: var(--foreground);
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:text-white:hover {
+      color: var(--color-white);
     }
   }
 

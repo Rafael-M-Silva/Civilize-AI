@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar';
 import { Button } from './components/ui/button';
 import { Badge } from './components/ui/badge';
@@ -30,13 +32,26 @@ import { Course, UserProgress, Badge as BadgeType, Quiz as QuizType } from './li
 
 type View = 'dashboard' | 'course' | 'quiz' | 'profile' | 'progress' | 'badges' | 'leaderboard';
 
-export default function App() {
+// Interface para dados do usuário do Google
+interface GoogleUser {
+  email: string;
+  name: string;
+  picture: string;
+  sub: string; // Google user ID
+}
+
+// IMPORTANTE: Substitua este valor pelo seu Google Client ID real
+// Obtenha um Client ID em: https://console.cloud.google.com/
+const GOOGLE_CLIENT_ID = "48530552991-bo96b17c2qfqiff3ke0ahkrnh746r0u9.apps.googleusercontent.com";
+
+function AppContent() {
   // Authentication state
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [userPreferredName, setUserPreferredName] = useState('');
+  const [googleUser, setGoogleUser] = useState<GoogleUser | null>(null);
   
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
@@ -64,6 +79,29 @@ export default function App() {
     const level = Math.floor(userXp / 200) + 1;
     setUserLevel(level);
   }, [userXp]);
+
+  // Restaurar sessão do localStorage ao carregar
+  useEffect(() => {
+    const storedUser = localStorage.getItem('civilizeai_user');
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setGoogleUser(userData);
+        setIsLoggedIn(true);
+        console.log('Sessão restaurada:', userData);
+      } catch (error) {
+        console.error('Erro ao restaurar sessão:', error);
+        localStorage.removeItem('civilizeai_user');
+      }
+    }
+  }, []);
+
+  // Salvar dados do usuário no localStorage quando o googleUser mudar
+  useEffect(() => {
+    if (googleUser) {
+      localStorage.setItem('civilizeai_user', JSON.stringify(googleUser));
+    }
+  }, [googleUser]);
 
   // Auto-unlock badges based on achievements
   useEffect(() => {
@@ -212,10 +250,10 @@ export default function App() {
   const selectedCourseProgress = userProgress.find(p => p.courseId === selectedCourseId);
 
   const user = {
-    id: 'current',
-    name: 'Você',
-    email: 'seu@email.com',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Current',
+    id: googleUser?.sub || 'current',
+    name: googleUser?.name || userPreferredName || 'Você',
+    email: googleUser?.email || 'seu@email.com',
+    avatar: googleUser?.picture || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Current',
     xp: userXp,
     level: userLevel,
     badges: badges,
@@ -266,12 +304,51 @@ export default function App() {
     setNeedsOnboarding(true); // Trigger onboarding for new session
   };
 
+  // Hook do Google Login - abre popup/redirect do Google
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      console.log("✅ Google Login Success! Token:", tokenResponse);
+      
+      try {
+        // Buscar informações do usuário usando o access_token
+        const userInfo = await axios.get(
+          'https://www.googleapis.com/oauth2/v3/userinfo',
+          { headers: { Authorization: `Bearer ${tokenResponse.access_token}` } }
+        );
+
+        console.log("✅ Dados do usuário obtidos:", userInfo.data);
+
+        // Criar objeto GoogleUser com os dados
+        const userData: GoogleUser = {
+          email: userInfo.data.email,
+          name: userInfo.data.name,
+          picture: userInfo.data.picture,
+          sub: userInfo.data.sub
+        };
+
+        // Salvar no estado (automaticamente salva no localStorage via useEffect)
+        setGoogleUser(userData);
+        setIsLoggedIn(true);
+        setShowLogin(false);
+        setShowSignUp(false);
+        setNeedsOnboarding(true);
+
+        console.log("🎉 Usuário logado com sucesso:", userData);
+      } catch (error) {
+        console.error("❌ Erro ao buscar dados do usuário:", error);
+      }
+    },
+    onError: (error) => {
+      console.error("❌ Erro no Google Login:", error);
+      alert("Erro ao fazer login com Google. Tente novamente.");
+    },
+    flow: 'implicit', // Usa implicit flow (popup/redirect)
+  });
+
   const handleGoogleSignIn = () => {
-    console.log("Continue with Google clicked");
-    // Simulate successful Google login
-    setIsLoggedIn(true);
-    setShowLogin(false);
-    setNeedsOnboarding(true); // Trigger onboarding for new session
+    console.log("🚀 Iniciando login com Google (popup)...");
+    // Chama a função do hook que abre o popup do Google
+    googleLogin();
   };
 
   const handleSignUp = (event: React.FormEvent<HTMLFormElement>) => {
@@ -286,11 +363,23 @@ export default function App() {
   };
 
   const handleGoogleSignUp = () => {
-    console.log("Continue with Google clicked");
-    // Simulate successful Google sign up
-    setIsLoggedIn(true);
-    setShowSignUp(false);
-    setNeedsOnboarding(true); // New users need onboarding
+    // Reutilizar a mesma lógica do Google Sign In
+    handleGoogleSignIn();
+  };
+
+  const handleLogout = () => {
+    // Limpar todos os dados do localStorage
+    localStorage.removeItem('civilizeai_user');
+    
+    // Resetar estados
+    setIsLoggedIn(false);
+    setGoogleUser(null);
+    setCurrentView('dashboard');
+    setSelectedCourseId(null);
+    setCurrentQuiz(null);
+    setMobileMenuOpen(false);
+    
+    console.log("Logout realizado - dados removidos do localStorage");
   };
 
   const handleOnboardingComplete = (data: any) => {
@@ -419,12 +508,7 @@ export default function App() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {
-                  setIsLoggedIn(false);
-                  setCurrentView('dashboard');
-                  setSelectedCourseId(null);
-                  setCurrentQuiz(null);
-                }}
+                onClick={handleLogout}
                 className="text-muted-foreground hover:text-destructive"
               >
                 <LogOut className="h-4 w-4 mr-2" />
@@ -478,13 +562,7 @@ export default function App() {
               <Button
                 variant="ghost"
                 className="w-full justify-start text-muted-foreground hover:text-destructive"
-                onClick={() => {
-                  setIsLoggedIn(false);
-                  setCurrentView('dashboard');
-                  setSelectedCourseId(null);
-                  setCurrentQuiz(null);
-                  setMobileMenuOpen(false);
-                }}
+                onClick={handleLogout}
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Sair
@@ -566,5 +644,13 @@ export default function App() {
         />
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <AppContent />
+    </GoogleOAuthProvider>
   );
 }

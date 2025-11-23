@@ -1,3 +1,13 @@
+import { ImageWithFallback } from './figma/ImageWithFallback';
+import { motion } from 'motion/react';
+import { cn } from '@/lib/utils';
+import { useState } from 'react';
+import logoAralize from 'figma:asset/e7c68171915ceb3c591a71757fda4ab4b592daed.png';
+import papagaioEstudando from 'figma:asset/8cd44a66feb1d956f624b7bbc1ce5fe9d9ec464f.png';
+import papagaioQuiz from 'figma:asset/7b847fea5d7fb4086f40ebd56e2f355031f52f76.png';
+import papagaioBadges from 'figma:asset/86f83f6960d9be1526eeb9d842e02a0042c503f5.png';
+import papagaioTrofeu from 'figma:asset/1510322d28f519a6d96a01426a3cc3cf67d82ad7.png';
+import papagaioApresentando from 'figma:asset/dd64a0b95b79e3ee74344f9563faf53b1224f74d.png';
 import { ContainerScroll } from './ui/container-scroll-animation';
 import { Timeline } from './ui/timeline';
 import { TestimonialsColumn } from './ui/testimonials-columns-1';
@@ -31,11 +41,6 @@ import {
   Menu,
   X
 } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
-import { motion } from 'motion/react';
-import { cn } from '@/lib/utils';
-import { useState } from 'react';
-import logoAralize from 'figma:asset/e7c68171915ceb3c591a71757fda4ab4b592daed.png';
 
 interface LandingPageProps {
   onLogin: () => void;
@@ -210,7 +215,7 @@ export function LandingPage({ onLogin }: LandingPageProps) {
           titleComponent={
             <div className="space-y-6 z-10">
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-center">
-                Sua jornada{' '}
+                Sua jornada<br className="sm:hidden" />{' '}
                 <TextLoop interval={3}>
                   {[
                     <span key="gamificada" style={{ color: '#FF2A1D', fontWeight: 700 }}>gamificada</span>,
@@ -265,10 +270,11 @@ A IA transforma projetos de lei, políticas públicas e dados oficiais em conte�
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <ImageWithFallback
-                    src="https://images.unsplash.com/photo-1759984782106-4b56d0aa05b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=500"
+                    src={papagaioEstudando}
                     alt="Estudante assistindo aula online"
                     className="rounded-lg object-cover h-32 md:h-44 lg:h-60 w-full shadow-lg"
                   />
+                  
                   <div className="flex flex-col justify-center p-4 bg-muted rounded-lg" style={{ background: 'linear-gradient(to bottom right, #3283FF, #68A4FF)' }}>
                     <div className="flex items-center gap-2 mb-3">
                       <BookOpen className="h-5 w-5" style={{ color: '#FFF' }} />
@@ -323,7 +329,7 @@ A IA transforma projetos de lei, políticas públicas e dados oficiais em conte�
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <ImageWithFallback
-                    src="https://images.unsplash.com/photo-1752937326758-f130e633b422?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=500"
+                    src={papagaioQuiz}
                     alt="Conquista e certificado"
                     className="rounded-lg object-cover h-32 md:h-44 lg:h-60 w-full shadow-lg"
                   />
@@ -356,12 +362,12 @@ Seu progresso vira:
                 </p>
                 <div className="grid grid-cols-2 gap-4">
                   <ImageWithFallback
-                    src="https://images.unsplash.com/photo-1594477898765-b9ad43ad9cfc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=500"
+                    src={papagaioBadges}
                     alt="Colaboração e conquistas"
                     className="rounded-lg object-cover h-32 md:h-44 lg:h-60 w-full shadow-lg"
                   />
                   <ImageWithFallback
-                    src="https://images.unsplash.com/photo-1617706111157-5f5c6443a04d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=500"
+                    src={papagaioTrofeu}
                     alt="Inovação e ideias"
                     className="rounded-lg object-cover h-32 md:h-44 lg:h-60 w-full shadow-lg"
                   />
@@ -385,41 +391,67 @@ Seu progresso vira:
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base mb-8">
                   A grande virada: sair da teoria e ir para a ação.
                 </p>
-                <div className="mb-8">
-                  <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
-                    <MessageSquare className="h-5 w-5" style={{ color: '#FF2A1D' }} />
-                    Integração com iniciativas de governo aberto (como o Brasil Participa)
-                  </div>
-                  <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
-                    <Lightbulb className="h-5 w-5" style={{ color: '#FF2A1D' }} />
-                    Convites para consultas públicas e audiências
-                  </div>
-                  <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
-                    <Users className="h-5 w-5" style={{ color: '#FF2A1D' }} />
-                    Badges reais por participação em processos oficiais
-                  </div>
-                  <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base">
-                    <Star className="h-5 w-5" style={{ color: '#FF2A1D' }} />
-                    Seu histórico de estudos se conecta a impacto público mensurável
-                  </div>
-                </div>
-                <div className="p-6 rounded-lg border-2" style={{ background: 'linear-gradient(to bottom right, #3283FF, #68A4FF)', borderColor: '#FF2A1D50' }}>
-                  <div className="flex items-start gap-4">
-                    <MessageSquare className="h-8 w-8 flex-shrink-0" style={{ color: '#fff' }} />
-                    <div>
-                      <p className="text-base mb-2 text-white">
-                        <strong>Sua voz importa!</strong>
-                      </p>
-                      <p className="text-sm text-muted-foreground text-white">
-                        Civilize AI é a ponte entre Educação → Ação
-                      </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <div className="mb-6">
+                      <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
+                        <MessageSquare className="h-5 w-5" style={{ color: '#FF2A1D' }} />
+                        Integração com iniciativas de governo aberto (como o Brasil Participa)
+                      </div>
+                      <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
+                        <Lightbulb className="h-5 w-5" style={{ color: '#FF2A1D' }} />
+                        Convites para consultas públicas e audiências
+                      </div>
+                      <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base mb-2">
+                        <Users className="h-5 w-5" style={{ color: '#FF2A1D' }} />
+                        Badges reais por participação em processos oficiais
+                      </div>
+                      <div className="flex gap-2 items-center text-neutral-700 dark:text-neutral-300 text-sm md:text-base">
+                        <Star className="h-5 w-5" style={{ color: '#FF2A1D' }} />
+                        Seu histórico de estudos se conecta a impacto público mensurável
+                      </div>
+                    </div>
+                    <div className="p-6 rounded-lg border-2" style={{ background: 'linear-gradient(to bottom right, #3283FF, #68A4FF)', borderColor: '#FF2A1D50' }}>
+                      <div className="flex items-start gap-4">
+                        <MessageSquare className="h-8 w-8 flex-shrink-0" style={{ color: '#fff' }} />
+                        <div>
+                          <p className="text-base mb-2 text-white">
+                            <strong>Sua voz importa!</strong>
+                          </p>
+                          <p className="text-sm text-muted-foreground text-white">
+                            Civilize AI é a ponte entre Educação → Ação
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                      <FlowHoverButton
+                        onClick={() => window.open('https://brasilparticipativo.presidencia.gov.br/processes?filter%5Bwith_area%5D=&filter%5Bwith_date%5D=all&filter%5Bwith_scope%5D=&filter%5Bwith_type%5D=1', '_blank')}
+                        icon={<ArrowRight className="h-4 w-4" />}
+                        className="flex-1 rounded-full border-0 text-white"
+                        style={{ backgroundColor: '#FF2A1D' }}
+                      >
+                        Consultas Públicas
+                      </FlowHoverButton>
+                      <FlowHoverButton
+                        onClick={() => window.open('https://brasilparticipativo.presidencia.gov.br', '_blank')}
+                        icon={<ArrowRight className="h-4 w-4" />}
+                        className="flex-1 rounded-full border-0 bg-white text-[#3283FF] hover:text-white"
+                      >
+                        Brasil Participativo
+                      </FlowHoverButton>
                     </div>
                   </div>
+                  <ImageWithFallback
+                    src={papagaioApresentando}
+                    alt="Papagaio apresentando participação cidadã"
+                    className="rounded-lg object-cover h-full w-full shadow-lg"
+                  />
                 </div>
               </div>
             ),
           },
-        ]}/>
+        ]} className="px-[16px] py-[10px] rounded-[100px]"/>
       </section>
 
       {/* Stats Section with Glowing Effect */}
