@@ -15,23 +15,23 @@
 
 ---
 
-## 📖 Sobre o Projeto
+## Sobre o Projeto
 
 **Civilize AI** é uma plataforma de aprendizagem gamificada que democratiza o acesso à educação cidadã no Brasil. Inspirada no Duolingo, a plataforma transforma conceitos complexos de direitos, deveres e participação social em conteúdos acessíveis, interativos e divertidos.
 
-### 🎯 Missão
+### Missão
 
 Empoderar cidadãos brasileiros com conhecimento sobre seus direitos, deveres e mecanismos de participação democrática através de uma experiência gamificada e acessível.
 
-### 🌟 Visão
+### Visão
 
 Tornar-se a principal plataforma de educação cidadã do Brasil, formando uma geração de cidadãos ativos, informados e engajados na construção de uma sociedade mais justa e democrática.
 
 ---
 
-## ✨ Funcionalidades Principais
+## Funcionalidades Principais
 
-### 🎓 Aprendizado Gamificado
+### Aprendizado Gamificado
 - **Cursos em Vídeo**: Módulos estruturados com videoaulas sobre cidadania, direitos e participação social
 - **Quizzes Interativos**: Avaliações após cada módulo com feedback instantâneo
 - **Sistema de XP**: Ganhe pontos de experiência ao completar aulas e quizzes
@@ -43,18 +43,18 @@ Tornar-se a principal plataforma de educação cidadã do Brasil, formando uma g
 - **Recompensas Diárias**: Ganhe 20 LizeCoins por login diário
 - **Ranking Global**: Compete com outros estudantes
 
-### 🪙 Economia Virtual (LizeCoins)
+### Economia Virtual (LizeCoins)
 - **150 LizeCoins iniciais** ao criar conta
 - **20 LizeCoins por dia** ao fazer login
 - **Compra de cursos premium** usando moedas virtuais
 - **Sistema de pacotes PIX** para adquirir mais moedas
 
-### 🤖 IA para Simplificação Legislativa
+### IA para Simplificação Legislativa
 - Tradução de leis e termos jurídicos em linguagem simples
 - Explicações acessíveis até para crianças
 - Contextualização de como as leis impactam o dia a dia
 
-### 📊 Acompanhamento de Progresso
+### Acompanhamento de Progresso
 - Painel personalizado com estatísticas
 - Histórico completo de atividades
 - Gráficos de evolução
