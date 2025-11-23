@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "./utils";
-import { Linkedin, Twitter } from 'lucide-react';
+import { Instagram, Youtube, Link2 } from 'lucide-react';
 
 const tape = <svg xmlns="http://www.w3.org/2000/svg" width="95" height="80" viewBox="0 0 95 80" fill="none">
 <path d="M1 45L70.282 5L88.282 36.1769L19 76.1769L1 45Z" fill="#3283FF"/>
@@ -92,22 +92,31 @@ export const FooterTapedDesign = ({ className, onFAQClick, onTermsClick, onPriva
 
         <div className="flex gap-4 items-center">
           <a
-            href="https://linkedin.com"
+            href="https://www.instagram.com/civilizeai/"
             target="_blank"
             rel="nofollow noopener"
-            aria-label="LinkedIn"
+            aria-label="Instagram"
             className="hover:opacity-80 transition-opacity"
           >
-            <Linkedin className="w-5 h-5 fill-neutral" />
+            <Instagram className="w-5 h-5" />
           </a>
           <a
-            href="https://twitter.com"
+            href="https://linktr.ee/civilizeai"
             target="_blank"
             rel="nofollow noopener"
-            aria-label="Twitter"
+            aria-label="Linktree"
             className="hover:opacity-80 transition-opacity"
           >
-            <Twitter className="w-5 h-5 fill-neutral" />
+            <Link2 className="w-5 h-5" />
+          </a>
+          <a
+            href="https://www.youtube.com/channel/UCfvpcolWQ-blm28dTSr1tBQ"
+            target="_blank"
+            rel="nofollow noopener"
+            aria-label="YouTube"
+            className="hover:opacity-80 transition-opacity"
+          >
+            <Youtube className="w-5 h-5" />
           </a>
         </div>
       </div>

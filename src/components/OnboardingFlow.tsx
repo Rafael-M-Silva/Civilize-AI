@@ -1,11 +1,13 @@
 import image_e7c68171915ceb3c591a71757fda4ab4b592daed from 'figma:asset/e7c68171915ceb3c591a71757fda4ab4b592daed.png';
 import image_daff672e48b6bae4cae7f3fe67ed448e6a653de1 from 'figma:asset/daff672e48b6bae4cae7f3fe67ed448e6a653de1.png';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, Sparkles, Play, CheckCircle2 } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { FlowHoverButton } from './ui/flow-hover-button';
+import { Confetti, ConfettiRef } from './ui/confetti';
+import confetti from 'canvas-confetti';
 
 interface OnboardingData {
   preferredName: string;
@@ -26,6 +28,7 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [videoWatched, setVideoWatched] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<string[]>([]);
+  const confettiRef = useRef<ConfettiRef>(null);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     preferredName: '',
     interests: [],
@@ -227,34 +230,45 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
   const introQuiz = [
     {
       id: 1,
-      question: 'Qual é a principal vantagem da gamificação no aprendizado?',
+      question: 'Segundo o vídeo, o que é política?',
       options: [
-        { value: 'a', text: 'Aumentar a motivação e engajamento' },
-        { value: 'b', text: 'Dificultar o processo' },
-        { value: 'c', text: 'Reduzir o tempo de estudo' },
-        { value: 'd', text: 'Substituir professores' },
+        { value: 'a', text: 'Apenas o que políticos fazem' },
+        { value: 'b', text: 'A arte de governar e tomar decisões coletivas' },
+        { value: 'c', text: 'Somente eleições e votações' },
+        { value: 'd', text: 'Discussões em redes sociais' },
       ],
-      correct: 'a',
+      correct: 'b',
     },
     {
       id: 2,
-      question: 'O que acontece quando você completa um módulo?',
+      question: 'Por que a política é importante para os cidadãos?',
       options: [
-        { value: 'a', text: 'Nada acontece' },
-        { value: 'b', text: 'Você ganha XP e desbloqueia novo conteúdo' },
-        { value: 'c', text: 'Você perde progresso' },
-        { value: 'd', text: 'O curso recomeça' },
+        { value: 'a', text: 'Não é importante' },
+        { value: 'b', text: 'Porque afeta decisões que impactam nossa vida cotidiana' },
+        { value: 'c', text: 'Apenas para quem quer ser político' },
+        { value: 'd', text: 'Somente em anos de eleição' },
       ],
       correct: 'b',
     },
     {
       id: 3,
-      question: 'Qual é o objetivo final da plataforma?',
+      question: 'Qual é o papel do cidadão na política?',
       options: [
-        { value: 'a', text: 'Apenas assistir vídeos' },
-        { value: 'b', text: 'Competir com outros usuários' },
-        { value: 'c', text: 'Aprender, evoluir e compartilhar ideias na ouvidoria' },
-        { value: 'd', text: 'Coletar badges' },
+        { value: 'a', text: 'Apenas votar a cada 4 anos' },
+        { value: 'b', text: 'Não participar, deixar para os políticos' },
+        { value: 'c', text: 'Participar ativamente, fiscalizar e se informar' },
+        { value: 'd', text: 'Reclamar nas redes sociais' },
+      ],
+      correct: 'c',
+    },
+    {
+      id: 4,
+      question: 'Como podemos exercer cidadania política no dia a dia?',
+      options: [
+        { value: 'a', text: 'Ignorando o que acontece no país' },
+        { value: 'b', text: 'Apenas assistindo notícias' },
+        { value: 'c', text: 'Participando, debatendo e se informando sobre decisões públicas' },
+        { value: 'd', text: 'Esperando que outros resolvam os problemas' },
       ],
       correct: 'c',
     },
@@ -346,7 +360,94 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
   const canCompleteLesson = videoWatched && 
     quizAnswers[0] !== undefined && quizAnswers[0] !== '' &&
     quizAnswers[1] !== undefined && quizAnswers[1] !== '' &&
-    quizAnswers[2] !== undefined && quizAnswers[2] !== '';
+    quizAnswers[2] !== undefined && quizAnswers[2] !== '' &&
+    quizAnswers[3] !== undefined && quizAnswers[3] !== '';
+
+  // Efeito de confetti e som quando tela de parabéns aparecer
+  useEffect(() => {
+    if (showCongratulations) {
+      // Som de língua de sogra (party horn)
+      const playPartyHornSound = () => {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // Som de língua de sogra - frequência crescente
+        oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.3);
+        oscillator.type = 'sawtooth';
+        
+        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+      };
+
+      // Função para disparar confetti
+      const fireConfetti = () => {
+        const count = 200;
+        const defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio: number, opts: any) {
+          confetti({
+            ...defaults,
+            ...opts,
+            particleCount: Math.floor(count * particleRatio),
+            colors: ['#FF2A1D', '#3283FF', '#E3C545', '#82F690']
+          });
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+
+        fire(0.2, {
+          spread: 60,
+        });
+
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+      };
+
+      // Primeira explosão de confetti e som imediatamente
+      playPartyHornSound();
+      setTimeout(fireConfetti, 100);
+
+      // Segunda explosão após 600ms
+      setTimeout(() => {
+        playPartyHornSound();
+        fireConfetti();
+      }, 600);
+
+      // Terceira explosão após 1200ms
+      setTimeout(() => {
+        playPartyHornSound();
+        fireConfetti();
+      }, 1200);
+    }
+  }, [showCongratulations]);
 
   // Tela de parabéns
   if (showCongratulations) {
@@ -491,19 +592,30 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
               {/* Video Section */}
               <div>
                 <h2 className="text-2xl font-semibold mb-4 text-foreground">
-                  📹 Módulo 1: Introdução à Plataforma
+                  📹 Módulo 1: O que é Política?
                 </h2>
                 <div className="relative aspect-video bg-zinc-900 rounded-2xl overflow-hidden">
                   {!videoWatched ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br">
-                      <Button
-                        onClick={handleWatchVideo}
-                        size="lg"
-                        className="rounded-full w-20 h-20 bg-white"
-                      >
-                        <Play className="w-10 h-10" />
-                      </Button>
-                    </div>
+                    <>
+                      <iframe
+                        className="absolute inset-0 w-full h-full"
+                        src="https://www.youtube.com/embed/lcdqEIPalbM"
+                        title="O que é política?"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                      <div className="absolute bottom-4 right-4 z-10">
+                        <Button
+                          onClick={handleWatchVideo}
+                          size="sm"
+                          className="bg-green-500 hover:bg-green-600 text-white"
+                        >
+                          <CheckCircle2 className="w-4 h-4 mr-2" />
+                          Marcar como Assistido
+                        </Button>
+                      </div>
+                    </>
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-green-500/20 to-emerald-500/20">
                       <motion.div
@@ -512,15 +624,11 @@ export function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
                         className="text-center"
                       >
                         <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto mb-4" />
-                        <p className="text-xl font-semibold text-foreground">Vídeo Concluído!</p>
-                        <p className="text-muted-foreground">+50 XP ganhos 🌟</p>
+                        <p className="text-xl font-semibold text-foreground text-white">Vídeo Concluído!</p>
+                        <p className="text-muted-foreground text-white">+50 XP ganhos 🌟</p>
                       </motion.div>
                     </div>
                   )}
-                  {/* Video placeholder */}
-                  <div className="w-full h-full flex items-center justify-center">
-                    <p className="text-white/60">Vídeo de Introdução (3:30)</p>
-                  </div>
                 </div>
               </div>
 

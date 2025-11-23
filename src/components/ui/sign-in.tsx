@@ -85,7 +85,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
         
         <div className="w-full max-w-md">
           <div className="flex flex-col gap-6">
-            <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight">{title}</h1>
+            <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight whitespace-nowrap">{title}</h1>
             <p className="animate-element animate-delay-200 text-muted-foreground">{description}</p>
 
             <form className="space-y-5" onSubmit={onSignIn}>

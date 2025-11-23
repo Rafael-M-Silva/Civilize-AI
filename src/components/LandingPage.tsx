@@ -620,14 +620,14 @@ Seu progresso vira:
                   <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border-[0.75px] bg-background p-6 shadow-sm dark:shadow-[0px_0px_27px_0px_rgba(45,45,45,0.3)] md:p-6">
                     <div className="relative flex flex-1 flex-col justify-between gap-3">
                       <div className="w-fit rounded-lg border-[0.75px] border-border bg-muted p-2">
-                        <Trophy className="h-4 w-4" />
+                        <Sparkles className="h-4 w-4" />
                       </div>
                       <div className="space-y-3">
                         <h3 className="pt-0.5 text-xl leading-[1.375rem] tracking-[-0.04em] md:text-2xl md:leading-[1.875rem] text-balance text-foreground">
-                          Conexão com governo aberto
+                          LizeCoins - Moeda Virtual
                         </h3>
                         <h2 className="text-sm leading-[1.125rem] md:text-base md:leading-[1.375rem] text-muted-foreground">
-                          Integramos dados e iniciativas de Senado, Câmara, TSE, Querido Diário e plataformas de participação social.
+                          Ganhe 150 LizeCoins iniciais e 20 LizeCoins por login diário. Compre cursos premium de forma totalmente gratuita usando suas moedas!
                         </h2>
                       </div>
                     </div>

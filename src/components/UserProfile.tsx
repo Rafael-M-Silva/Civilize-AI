@@ -214,14 +214,14 @@ export function UserProfile({ user, courses, badges }: UserProfileProps) {
               Você ainda não iniciou nenhum curso.
             </p>
           ) : (
-            user.progress.map(progress => {
+            user.progress.map((progress, index) => {
               const course = courses.find(c => c.id === progress.courseId);
               if (!course) return null;
               
               const progressPercentage = (progress.modulesCompleted.length / course.totalModules) * 100;
 
               return (
-                <div key={progress.courseId} className="space-y-2">
+                <div key={`${progress.courseId}-${index}`} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <p className="font-medium">{course.title}</p>

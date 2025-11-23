@@ -1,3 +1,5 @@
+import { AccessibilityTools } from './components/AccessibilityTools';
+import { DailyRewardCalendar } from './components/DailyRewardCalendar';
 import { OnboardingFlow } from './components/OnboardingFlow';
 import lizeCoinIcon from 'figma:asset/085fc565bb4f512d3e3f3cfb35b8d2b508a6879f.png';
 import logoAralize from 'figma:asset/e7c68171915ceb3c591a71757fda4ab4b592daed.png';
@@ -36,7 +38,6 @@ import { TermsPage } from './components/TermsPage';
 import { PrivacyPage } from './components/PrivacyPage';
 import { Course, Badge as BadgeType, UserProgress, Quiz as QuizType, LeaderboardEntry } from './lib/types';
 import { mockCourses, allBadges, mockLeaderboard } from './lib/mockData';
-import { AccessibilityTools } from './components/AccessibilityTools';
 
 type View = 'dashboard' | 'course' | 'quiz' | 'profile' | 'progress' | 'badges' | 'leaderboard';
 
@@ -76,6 +77,7 @@ function AppContent() {
   const [userLevel, setUserLevel] = useState(4);
   const [userCoins, setUserCoins] = useState(150); // LizeCoins iniciais
   const [unlockedCourses, setUnlockedCourses] = useState<string[]>([]); // Cursos desbloqueados pelo usuário
+  const [loginDates, setLoginDates] = useState<string[]>([]); // Datas de login do usuário
   const [userProgress, setUserProgress] = useState<UserProgress[]>([
     {
       courseId: 'course-1',
@@ -117,6 +119,38 @@ function AppContent() {
       localStorage.setItem('civilizeai_user', JSON.stringify(googleUser));
     }
   }, [googleUser]);
+
+  // Carregar loginDates do localStorage
+  useEffect(() => {
+    const storedLoginDates = localStorage.getItem('civilizeai_loginDates');
+    if (storedLoginDates) {
+      try {
+        const dates = JSON.parse(storedLoginDates);
+        setLoginDates(dates);
+      } catch (error) {
+        console.error('Erro ao carregar loginDates:', error);
+      }
+    }
+  }, []);
+
+  // Salvar loginDates no localStorage quando mudar
+  useEffect(() => {
+    if (loginDates.length > 0) {
+      localStorage.setItem('civilizeai_loginDates', JSON.stringify(loginDates));
+    }
+  }, [loginDates]);
+
+  // Handler para recompensa diária
+  const handleDailyReward = () => {
+    const today = new Date().toISOString().split('T')[0];
+    
+    if (!loginDates.includes(today)) {
+      const DAILY_REWARD = 20;
+      setUserCoins(prev => prev + DAILY_REWARD);
+      setLoginDates(prev => [...prev, today]);
+      console.log(`🎁 +${DAILY_REWARD} LizeCoins pela recompensa diária!`);
+    }
+  };
 
   // Auto-unlock badges based on achievements
   useEffect(() => {
@@ -430,7 +464,7 @@ function AppContent() {
       <>
         <AccessibilityTools />
         <SignInPage
-          title={<span className="font-light text-foreground tracking-tighter">Bem-vindo ao <span className="font-semibold">Civilize AI</span></span>}
+          title={<span className="font-light text-foreground tracking-tighter">Bem-vindo ao <span className="font-semibold whitespace-nowrap">Civilize AI</span></span>}
           description="Acesse sua conta e continue sua jornada de aprendizado gamificada"
           heroImageSrc="https://images.unsplash.com/photo-1664545141018-c70ca9e78a76?q=80&w=1025&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           testimonials={testimonials}
@@ -614,6 +648,10 @@ function AppContent() {
                 />
                 <span className="text-sm">{userCoins.toLocaleString()}</span>
               </div>
+              <DailyRewardCalendar 
+                loginDates={loginDates}
+                onDailyReward={handleDailyReward}
+              />
               <Avatar>
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
@@ -696,8 +734,14 @@ function AppContent() {
             userInterests={userInterests}
             userCoins={userCoins}
             unlockedCourses={unlockedCourses}
+            userName={user.name}
+            userEmail={user.email}
             onStartCourse={handleStartCourse}
             onUnlockCourse={handleUnlockCourse}
+            onCoinsAdded={(coins) => {
+              setUserCoins(prev => prev + coins);
+              alert(`✅ Pagamento confirmado! +${coins} LizeCoins adicionados à sua conta!`);
+            }}
           />
         )}
 

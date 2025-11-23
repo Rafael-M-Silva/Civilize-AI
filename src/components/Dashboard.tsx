@@ -2,11 +2,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
-import { BookOpen, Trophy, Target, Coins, Lock } from 'lucide-react';
+import { BookOpen, Trophy, Target, Coins, Lock, ShoppingCart, Sparkles, XIcon, Banknote } from 'lucide-react';
 import { Course, UserProgress } from '@/lib/types';
 import { ExpandableChatDemo } from './ExpandableChatDemo';
 import lizeCoinIcon from 'figma:asset/085fc565bb4f512d3e3f3cfb35b8d2b508a6879f.png';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { CreativePricing, PricingTier } from './ui/creative-pricing';
+import { CheckoutPix } from './CheckoutPix';
+import { useState } from 'react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 
 interface DashboardProps {
   courses: Course[];
@@ -16,8 +20,11 @@ interface DashboardProps {
   userInterests?: string[];
   userCoins: number;
   unlockedCourses: string[];
+  userName?: string;
+  userEmail?: string;
   onStartCourse: (courseId: string) => void;
   onUnlockCourse: (courseId: string, price: number) => void;
+  onCoinsAdded?: (coins: number) => void;
 }
 
 export function Dashboard({ 
@@ -28,9 +35,51 @@ export function Dashboard({
   userInterests = [], 
   userCoins,
   unlockedCourses,
+  userName = "Usuário",
+  userEmail = "usuario@civilizeai.com",
   onStartCourse,
-  onUnlockCourse 
+  onUnlockCourse,
+  onCoinsAdded
 }: DashboardProps) {
+  const [showCoinPurchaseModal, setShowCoinPurchaseModal] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<PricingTier | null>(null);
+  const [showCheckout, setShowCheckout] = useState(false);
+  
+  // Pacotes de LizeCoins
+  const coinPackages: PricingTier[] = [
+    {
+      name: "Pacote Básico",
+      icon: <Banknote className="w-6 h-6 text-amber-500" />,
+      price: 7,
+      coins: 500,
+      description: "Perfeito para começar",
+      color: "amber",
+      features: [
+        "500 LizeCoins",
+        "Desbloqueie 1 curso aleatório",
+      ],
+    },
+    {
+      name: "Pacote Premium",
+      icon: <Banknote className="w-6 h-6 text-blue-500" />,
+      price: 10,
+      coins: 1000,
+      description: "Melhor custo-benefício",
+      color: "blue",
+      features: [
+        "1000 LizeCoins",
+        "Desbloqueie 1 curso aleatório",
+      ],
+      popular: true,
+    },
+  ];
+
+  const handlePurchase = (tier: PricingTier) => {
+    setSelectedPackage(tier);
+    setShowCoinPurchaseModal(false);
+    setShowCheckout(true);
+  };
+  
   // Curso grátis recomendado (primeiro curso baseado nos interesses do usuário)
   const freeCourse = userInterests.length > 0
     ? courses.find(course => course.interest && userInterests.includes(course.interest))
@@ -177,7 +226,7 @@ export function Dashboard({
             <CardTitle className="text-sm">LizeCoins</CardTitle>
             <ImageWithFallback src={lizeCoinIcon} alt="LizeCoin" className="h-6 w-6" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
             <div className="text-2xl flex items-center gap-2">
               {userCoins.toLocaleString()}
               <ImageWithFallback src={lizeCoinIcon} alt="LizeCoin" className="h-6 w-6" />
@@ -185,6 +234,17 @@ export function Dashboard({
             <p className="text-xs text-muted-foreground">
               Moedas disponíveis
             </p>
+            <Button 
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowCoinPurchaseModal(true);
+              }}
+              className="w-full bg-[#E3C545] text-black hover:bg-[#D4B635] transition-colors"
+              size="sm"
+            >
+              <ShoppingCart className="h-4 w-4 mr-2" />
+              Comprar Moedas
+            </Button>
           </CardContent>
         </Card>
 
@@ -277,6 +337,77 @@ export function Dashboard({
       
       {/* Chat AI */}
       <ExpandableChatDemo />
+      
+      {/* Modal de Compra de LizeCoins */}
+      <DialogPrimitive.Root open={showCoinPurchaseModal} onOpenChange={setShowCoinPurchaseModal}>
+        <DialogPrimitive.Portal>
+          {/* Overlay bem escuro */}
+          <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/90 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+          
+          {/* Conteúdo do Modal */}
+          <DialogPrimitive.Content 
+            className="fixed top-[50%] left-[50%] z-50 translate-x-[-50%] translate-y-[-50%] w-[95vw] h-[95vh] max-w-[95vw] max-h-[95vh] overflow-y-auto rounded-lg bg-white dark:bg-zinc-900 p-8 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
+            aria-describedby={undefined}
+          >
+            {/* Título acessível (visualmente oculto) */}
+            <DialogPrimitive.Title className="sr-only">
+              Comprar LizeCoins
+            </DialogPrimitive.Title>
+            
+            {/* Botão de fechar */}
+            <DialogPrimitive.Close className="absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden z-10">
+              <XIcon className="h-6 w-6" />
+              <span className="sr-only">Fechar</span>
+            </DialogPrimitive.Close>
+            
+            {/* Conteúdo */}
+            <div className="flex items-center justify-center min-h-full">
+              <CreativePricing 
+                tiers={coinPackages}
+                onSelectPlan={handlePurchase}
+              />
+            </div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
+      
+      {/* Modal de Checkout */}
+      <DialogPrimitive.Root open={showCheckout} onOpenChange={setShowCheckout}>
+        <DialogPrimitive.Portal>
+          {/* Overlay bem escuro */}
+          <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/90 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+          
+          {/* Conteúdo do Modal */}
+          <DialogPrimitive.Content 
+            className="fixed top-[50%] left-[50%] z-50 translate-x-[-50%] translate-y-[-50%] w-[95vw] h-[95vh] max-w-[95vw] max-h-[95vh] overflow-y-auto rounded-lg bg-white dark:bg-zinc-900 p-8 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
+            aria-describedby={undefined}
+          >
+            {/* Título acessível (visualmente oculto) */}
+            <DialogPrimitive.Title className="sr-only">
+              Checkout
+            </DialogPrimitive.Title>
+            
+            {/* Botão de fechar */}
+            <DialogPrimitive.Close className="absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden z-10">
+              <XIcon className="h-6 w-6" />
+              <span className="sr-only">Fechar</span>
+            </DialogPrimitive.Close>
+            
+            {/* Conteúdo */}
+            <div className="flex items-center justify-center min-h-full">
+              {selectedPackage && (
+                <CheckoutPix 
+                  package={selectedPackage}
+                  userName={userName}
+                  userEmail={userEmail}
+                  onCoinsAdded={onCoinsAdded}
+                  onClose={() => setShowCheckout(false)}
+                />
+              )}
+            </div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
     </div>
   );
 }

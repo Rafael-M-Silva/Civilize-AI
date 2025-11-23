@@ -1,5 +1,8 @@
 @custom-variant dark (&:is(.dark *));
 
+/* Fonte Handwritten para o modal de pricing */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap');
+
 /* Fonte LT Institute by LyonsType */
 @font-face {
   font-family: 'LT Institute';
@@ -379,4 +382,9 @@ html {
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;  /* Safari and Chrome */
+}
+
+/* Classe para fonte handwritten */
+.font-handwritten {
+  font-family: 'Caveat', cursive;
 }
