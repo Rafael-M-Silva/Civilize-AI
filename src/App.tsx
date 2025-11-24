@@ -20,7 +20,10 @@ import {
   Menu,
   X,
   LogOut,
-  Coins
+  Coins,
+  ShoppingBag,
+  TrendingUp,
+  Settings
 } from 'lucide-react';
 import { Dashboard } from './components/Dashboard';
 import { CourseViewer } from './components/CourseViewer';
@@ -29,6 +32,7 @@ import { UserProfile } from './components/UserProfile';
 import { ProgressTracker } from './components/ProgressTracker';
 import { BadgeSystem } from './components/BadgeSystem';
 import { Leaderboard } from './components/Leaderboard';
+import { AdminDashboard } from './components/AdminDashboard';
 import { LandingPage } from './components/LandingPage';
 import { SignInPage, Testimonial } from './components/ui/sign-in';
 import { SignUpPage } from './components/ui/sign-up';
@@ -38,8 +42,11 @@ import { TermsPage } from './components/TermsPage';
 import { PrivacyPage } from './components/PrivacyPage';
 import { Course, Badge as BadgeType, UserProgress, Quiz as QuizType, LeaderboardEntry } from './lib/types';
 import { mockCourses, allBadges, mockLeaderboard } from './lib/mockData';
+import { Sidebar, SidebarBody, SidebarLink } from './components/ui/sidebar';
+import { motion } from 'motion/react';
+import { cn } from './lib/utils';
 
-type View = 'dashboard' | 'course' | 'quiz' | 'profile' | 'progress' | 'badges' | 'leaderboard';
+type View = 'dashboard' | 'course' | 'quiz' | 'profile' | 'progress' | 'badges' | 'leaderboard' | 'admin';
 
 // Interface para dados do usuário do Google
 interface GoogleUser {
@@ -66,11 +73,13 @@ function AppContent() {
   const [userPreferredName, setUserPreferredName] = useState('');
   const [userInterests, setUserInterests] = useState<string[]>([]);
   const [googleUser, setGoogleUser] = useState<GoogleUser | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false); // Novo estado para verificar se é admin
   
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [currentQuiz, setCurrentQuiz] = useState<QuizType | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // User state
   const [userXp, setUserXp] = useState(850);
@@ -365,10 +374,28 @@ function AppContent() {
     const formData = new FormData(event.currentTarget);
     const data = Object.fromEntries(formData.entries());
     console.log("Sign In submitted:", data);
-    // Simulate successful login
-    setIsLoggedIn(true);
-    setShowLogin(false);
-    setNeedsOnboarding(true); // Trigger onboarding for new session
+    
+    // Verificar se é admin
+    if (data.email === 'admin' && data.password === 'admin') {
+      console.log("🔑 Admin login detectado!");
+      setIsAdmin(true);
+      setIsLoggedIn(true);
+      setShowLogin(false);
+      setNeedsOnboarding(false); // Admin não precisa de onboarding
+      // Definir dados do admin
+      setGoogleUser({
+        email: 'admin@civilizeai.com',
+        name: 'Administrador',
+        picture: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin',
+        sub: 'admin-001'
+      });
+    } else {
+      // Login normal
+      setIsAdmin(false);
+      setIsLoggedIn(true);
+      setShowLogin(false);
+      setNeedsOnboarding(true); // Usuários normais precisam de onboarding
+    }
   };
 
   // Hook do Google Login - abre popup/redirect do Google
@@ -589,221 +616,301 @@ function AppContent() {
     );
   }
 
+  // Logo component for sidebar
+  const Logo = () => (
+    <div 
+      className="flex space-x-2 items-center cursor-pointer py-1 relative z-20"
+      onClick={() => {
+        setCurrentView('dashboard');
+        setSelectedCourseId(null);
+        setCurrentQuiz(null);
+      }}
+    >
+      <ImageWithFallback 
+        src={logoAralize} 
+        alt="Logo Civilize AI" 
+        className="h-8 w-8 object-contain flex-shrink-0" 
+      />
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="font-bold text-foreground whitespace-pre"
+      >
+        Civilize AI
+      </motion.span>
+    </div>
+  );
+
+  const LogoIcon = () => (
+    <div 
+      className="flex space-x-2 items-center cursor-pointer py-1 relative z-20"
+      onClick={() => {
+        setCurrentView('dashboard');
+        setSelectedCourseId(null);
+        setCurrentQuiz(null);
+      }}
+    >
+      <ImageWithFallback 
+        src={logoAralize} 
+        alt="Logo Civilize AI" 
+        className="h-8 w-8 object-contain flex-shrink-0" 
+      />
+    </div>
+  );
+
+  // Sidebar links - Filtrar Admin link baseado em permissão
+  const sidebarLinks = [
+    {
+      label: "Dashboard",
+      href: "#dashboard",
+      icon: <Home className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+      onClick: () => {
+        setCurrentView('dashboard');
+        setSelectedCourseId(null);
+        setCurrentQuiz(null);
+      }
+    },
+    {
+      label: "Progresso",
+      href: "#progress",
+      icon: <TrendingUp className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+      onClick: () => setCurrentView('progress')
+    },
+    {
+      label: "Conquistas",
+      href: "#badges",
+      icon: <Award className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+      onClick: () => setCurrentView('badges')
+    },
+    {
+      label: "Ranking",
+      href: "#leaderboard",
+      icon: <Trophy className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+      onClick: () => setCurrentView('leaderboard')
+    },
+    {
+      label: "Perfil",
+      href: "#profile",
+      icon: <User className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+      onClick: () => setCurrentView('profile')
+    },
+    // Mostrar Admin apenas se isAdmin for true
+    ...(isAdmin ? [{
+      label: "Admin",
+      href: "#admin",
+      icon: <Settings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+      onClick: () => setCurrentView('admin')
+    }] : []),
+  ];
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Accessibility Tools - Available on all pages */}
+    <div className={cn(
+      "flex flex-col md:flex-row bg-background w-full flex-1 mx-auto overflow-hidden",
+      "h-screen"
+    )}>
+      {/* Accessibility Tools */}
       <AccessibilityTools />
       
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 bg-[rgba(249,249,249,0.12)]">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => {
-              setCurrentView('dashboard');
-              setSelectedCourseId(null);
-              setCurrentQuiz(null);
-              setMobileMenuOpen(false);
-            }}>
-              <ImageWithFallback 
-                src={logoAralize} 
-                alt="Logo Civilize AI" 
-                className="h-8 w-8 object-contain" 
-              />
-              <h1 className="font-bold">Civilize AI</h1>
+      <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
+        <SidebarBody className="justify-between gap-10">
+          <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+            {sidebarOpen ? <Logo /> : <LogoIcon />}
+            <div className="mt-8 flex flex-col gap-2">
+              {sidebarLinks.map((link, idx) => (
+                <SidebarLink key={idx} link={link} />
+              ))}
             </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-2">
-              {menuItems.map(item => (
-                <Button
-                  key={item.id}
-                  variant={currentView === item.id ? 'default' : 'ghost'}
-                  onClick={() => {
-                    setCurrentView(item.id as View);
-                    setSelectedCourseId(null);
-                    setCurrentQuiz(null);
+          </div>
+          <div className="flex flex-col gap-2">
+            {/* User Stats */}
+            <div className="flex flex-col gap-2 pb-2 border-b border-neutral-200 dark:border-neutral-700">
+              <motion.div 
+                className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#3283FF]/10"
+                animate={{
+                  justifyContent: sidebarOpen ? "flex-start" : "center"
+                }}
+              >
+                <Trophy className="h-4 w-4 text-[#3283FF] flex-shrink-0" />
+                <motion.span 
+                  className="text-sm"
+                  animate={{
+                    display: sidebarOpen ? "inline-block" : "none",
+                    opacity: sidebarOpen ? 1 : 0,
                   }}
                 >
-                  <item.icon className="h-4 w-4 mr-2" />
-                  {item.label}
-                </Button>
-              ))}
-            </nav>
-
-            {/* User Info */}
-            <div className="hidden md:flex items-center gap-4">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 bg-[rgba(0,0,0,0.15)]">
-                <Trophy className="h-4 w-4 text-primary" />
-                <span className="text-sm">Nível {userLevel}</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10 bg-[rgba(0,0,0,0.15)]">
-                <Target className="h-4 w-4 text-blue-500" />
-                <span className="text-sm">{userXp.toLocaleString()} XP</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-yellow-500/10 bg-[rgba(0,0,0,0.15)]">
+                  Nível {userLevel}
+                </motion.span>
+              </motion.div>
+              
+              <motion.div 
+                className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#82F690]/10"
+                animate={{
+                  justifyContent: sidebarOpen ? "flex-start" : "center"
+                }}
+              >
+                <Target className="h-4 w-4 text-[#82F690] flex-shrink-0" />
+                <motion.span 
+                  className="text-sm"
+                  animate={{
+                    display: sidebarOpen ? "inline-block" : "none",
+                    opacity: sidebarOpen ? 1 : 0,
+                  }}
+                >
+                  {userXp.toLocaleString()} XP
+                </motion.span>
+              </motion.div>
+              
+              <motion.div 
+                className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#E3C545]/10"
+                animate={{
+                  justifyContent: sidebarOpen ? "flex-start" : "center"
+                }}
+              >
                 <ImageWithFallback
                   src={lizeCoinIcon}
                   alt="LizeCoin"
-                  className="h-5 w-5"
+                  className="h-4 w-4 flex-shrink-0"
                 />
-                <span className="text-sm">{userCoins.toLocaleString()}</span>
-              </div>
-              <DailyRewardCalendar 
-                loginDates={loginDates}
-                onDailyReward={handleDailyReward}
-              />
-              <Avatar>
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-                className="text-muted-foreground hover:text-destructive"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair
-              </Button>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
-          </div>
-
-          {/* Mobile Navigation */}
-          {mobileMenuOpen && (
-            <div className="md:hidden mt-4 pb-4 space-y-2 border-t pt-4">
-              <div className="flex items-center gap-4 mb-4">
-                <Avatar>
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <p>{user.name}</p>
-                  <div className="flex gap-2 mt-1">
-                    <Badge variant="outline" className="text-xs">Nível {userLevel}</Badge>
-                    <Badge variant="outline" className="text-xs">{userXp.toLocaleString()} XP</Badge>
-                  </div>
-                </div>
-              </div>
-              {menuItems.map(item => (
-                <Button
-                  key={item.id}
-                  variant={currentView === item.id ? 'default' : 'ghost'}
-                  className="w-full justify-start"
-                  onClick={() => {
-                    setCurrentView(item.id as View);
-                    setSelectedCourseId(null);
-                    setCurrentQuiz(null);
-                    setMobileMenuOpen(false);
+                <motion.span 
+                  className="text-sm"
+                  animate={{
+                    display: sidebarOpen ? "inline-block" : "none",
+                    opacity: sidebarOpen ? 1 : 0,
                   }}
                 >
-                  <item.icon className="h-4 w-4 mr-2" />
-                  {item.label}
-                </Button>
-              ))}
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-muted-foreground hover:text-destructive"
-                onClick={handleLogout}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair
-              </Button>
+                  {userCoins.toLocaleString()}
+                </motion.span>
+              </motion.div>
             </div>
+
+            {/* Logout Button */}
+            <SidebarLink
+              link={{
+                label: "Sair",
+                href: "#logout",
+                icon: <LogOut className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+                onClick: handleLogout
+              }}
+            />
+
+            {/* User Info */}
+            <SidebarLink
+              link={{
+                label: user.name,
+                href: "#user",
+                icon: (
+                  <Avatar className="h-7 w-7 flex-shrink-0">
+                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                ),
+                onClick: () => setCurrentView('profile')
+              }}
+            />
+          </div>
+        </SidebarBody>
+      </Sidebar>
+
+      {/* Main Dashboard Content */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Top Header Bar */}
+        <div className="h-16 px-4 md:px-6 border-b border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-foreground">
+            {currentView === 'dashboard' && 'Dashboard'}
+            {currentView === 'progress' && 'Meu Progresso'}
+            {currentView === 'badges' && 'Conquistas'}
+            {currentView === 'leaderboard' && 'Ranking'}
+            {currentView === 'profile' && 'Meu Perfil'}
+            {currentView === 'admin' && 'Painel Administrativo'}
+            {currentView === 'course' && (selectedCourse?.title || 'Curso')}
+            {currentView === 'quiz' && 'Quiz'}
+          </h2>
+          <div className="flex items-center gap-3">
+            <DailyRewardCalendar 
+              loginDates={loginDates}
+              onDailyReward={handleDailyReward}
+            />
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-auto p-4 md:p-6 bg-gray-50 dark:bg-neutral-950">
+          {currentView === 'dashboard' && (
+            <Dashboard
+              courses={courses}
+              userProgress={userProgress}
+              userXp={userXp}
+              userLevel={userLevel}
+              userInterests={userInterests}
+              userCoins={userCoins}
+              unlockedCourses={unlockedCourses}
+              userName={user.name}
+              userEmail={user.email}
+              onStartCourse={handleStartCourse}
+              onUnlockCourse={handleUnlockCourse}
+              onCoinsAdded={(coins) => {
+                setUserCoins(prev => prev + coins);
+                alert(`✅ Pagamento confirmado! +${coins} LizeCoins adicionados à sua conta!`);
+              }}
+            />
+          )}
+
+          {currentView === 'course' && selectedCourse && selectedCourseProgress && (
+            <CourseViewer
+              course={selectedCourse}
+              userProgress={selectedCourseProgress}
+              onModuleComplete={handleModuleComplete}
+              onStartQuiz={handleStartQuiz}
+              onBack={handleCourseBack}
+            />
+          )}
+
+          {currentView === 'quiz' && currentQuiz && (
+            <Quiz
+              quiz={currentQuiz}
+              onComplete={handleQuizComplete}
+              onBack={handleQuizBack}
+            />
+          )}
+
+          {currentView === 'profile' && (
+            <UserProfile
+              user={user}
+              courses={courses}
+              badges={badges}
+            />
+          )}
+
+          {currentView === 'progress' && (
+            <ProgressTracker
+              courses={courses}
+              userProgress={userProgress}
+              userXp={userXp}
+              userLevel={userLevel}
+            />
+          )}
+
+          {currentView === 'badges' && (
+            <BadgeSystem
+              badges={badges}
+              totalModulesCompleted={totalModulesCompleted}
+              totalCoursesCompleted={totalCoursesCompleted}
+              userLevel={userLevel}
+            />
+          )}
+
+          {currentView === 'leaderboard' && (
+            <Leaderboard
+              leaderboard={mockLeaderboard}
+              currentUserId="current"
+            />
+          )}
+
+          {currentView === 'admin' && (
+            <AdminDashboard />
           )}
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        {currentView === 'dashboard' && (
-          <Dashboard
-            courses={courses}
-            userProgress={userProgress}
-            userXp={userXp}
-            userLevel={userLevel}
-            userInterests={userInterests}
-            userCoins={userCoins}
-            unlockedCourses={unlockedCourses}
-            userName={user.name}
-            userEmail={user.email}
-            onStartCourse={handleStartCourse}
-            onUnlockCourse={handleUnlockCourse}
-            onCoinsAdded={(coins) => {
-              setUserCoins(prev => prev + coins);
-              alert(`✅ Pagamento confirmado! +${coins} LizeCoins adicionados à sua conta!`);
-            }}
-          />
-        )}
-
-        {currentView === 'course' && selectedCourse && selectedCourseProgress && (
-          <CourseViewer
-            course={selectedCourse}
-            userProgress={selectedCourseProgress}
-            onModuleComplete={handleModuleComplete}
-            onStartQuiz={handleStartQuiz}
-            onBack={handleCourseBack}
-          />
-        )}
-
-        {currentView === 'quiz' && currentQuiz && (
-          <Quiz
-            quiz={currentQuiz}
-            onComplete={handleQuizComplete}
-            onBack={handleQuizBack}
-          />
-        )}
-
-        {currentView === 'profile' && (
-          <UserProfile
-            user={user}
-            courses={courses}
-            badges={badges}
-          />
-        )}
-
-        {currentView === 'progress' && (
-          <ProgressTracker
-            courses={courses}
-            userProgress={userProgress}
-            userXp={userXp}
-            userLevel={userLevel}
-          />
-        )}
-
-        {currentView === 'badges' && (
-          <BadgeSystem
-            badges={badges}
-            totalModulesCompleted={totalModulesCompleted}
-            totalCoursesCompleted={totalCoursesCompleted}
-            userLevel={userLevel}
-          />
-        )}
-
-        {currentView === 'leaderboard' && (
-          <Leaderboard
-            leaderboard={mockLeaderboard}
-            currentUserId="current"
-          />
-        )}
-      </main>
-
-      {/* Onboarding Flow */}
-      {needsOnboarding && (
-        <OnboardingFlow
-          onComplete={handleOnboardingComplete}
-          onCancel={() => setNeedsOnboarding(false)}
-        />
-      )}
+      </div>
     </div>
   );
 }

@@ -120,7 +120,7 @@ export function Dashboard({
         onClick={() => !isLocked && onStartCourse(course.id)}
       >
         {isLocked && (
-          <div className="absolute top-4 right-4 z-10 bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1">
+          <div className="absolute top-4 right-20 z-10 bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1">
             <Lock className="h-4 w-4 text-white" />
             <span className="text-sm text-white font-medium">{course.coinPrice}</span>
           </div>
