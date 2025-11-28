@@ -279,13 +279,13 @@ SOFTWARE.
 
 ## 📚 Documentação Adicional
 
-Para documentação detalhada, consulte a pasta [/docs](./docs):
+Para documentação detalhada, consulte a pasta [/docs](./src/docs):
 
-- [Tecnologias Utilizadas](./docs/TECNOLOGIAS.md)
+- [Tecnologias Utilizadas](./src/docs/TECNOLOGIAS.md)
 - [Design System](./docs/DESIGN_SYSTEM.md)
-- [Jornada do Usuário](./docs/JORNADA_USUARIO.md)
-- [Sistema LizeCoins](./docs/LIZECOINS.md)
-- [IA e Simplificação Legislativa](./docs/IA_SIMPLIFICACAO.md)
+- [Jornada do Usuário](./src/docs/JORNADA_USUARIO.md)
+- [Sistema LizeCoins](./src/docs/LIZECOINS.md)
+- [IA e Simplificação Legislativa](./src/docs/IA_SIMPLIFICACAO.md)
 
 ---
 
