@@ -205,7 +205,7 @@ A identidade visual é inspirada no mascote **Aralize**, uma arara-canga com as 
 - **Fonte Principal**: LT Institute by LyonsType, Sans-Serif
 - **Esquema**: 60-30-10 (60% cor dominante, 30% secundária, 10% destaque)
 
-Para mais detalhes, veja a [Documentação de Design](./docs/DESIGN_SYSTEM.md).
+Para mais detalhes, veja a [Documentação de Design](./src/docs/DESIGN_SYSTEM.md).
 
 ---
 
